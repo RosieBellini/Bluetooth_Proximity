@@ -2,6 +2,9 @@ package com.example.b2026015.bluetooth.rfb.activities;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import android.bluetooth.BluetoothAdapter;
@@ -26,10 +29,21 @@ public class BeaconActivity extends Activity {
     CustomAdapter ca;
     ArrayList prgmName;
 
-    public static ArrayList<Integer> beaconImages= new ArrayList<>();
+    public static Integer[] beaconImages = {R.drawable.beaconb, R.drawable.beacong, R.drawable.beaconp};
+    public static Integer[] deviceImages = {R.drawable.deviceb, R.drawable.deviceg, R.drawable.devicep};
+
+    public static Map<String, List<String>> beacons  = new HashMap<>();
+    public static Map<String, List<String>> devices  = new HashMap<>();
+
+    public static ArrayList<Integer> beaconImagesU= new ArrayList<>();
     public static ArrayList<String> beaconNameList = new ArrayList<>();
     public static ArrayList<String> macAddressList = new ArrayList<>();
     public static ArrayList<Double> proxValues = new ArrayList<>();
+
+    public static ArrayList<Integer> deviceImages= new ArrayList<>();
+    public static ArrayList<String> beaconNameList = new ArrayList<>();
+    public static ArrayList<String> macAddressListB = new ArrayList<>();
+    public static ArrayList<Double> proxValuesB = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,23 +102,14 @@ public class BeaconActivity extends Activity {
         return true;
     }
 
-    public void fillValues()
+    public void fillValues(Map<String, List<String>> values)
     {
-        beaconNameList.add("Office");
-        beaconNameList.add("Kitchen");
-        beaconNameList.add("Meeting Room");
-
-        proxValues.add(6.6);
-        proxValues.add(3.2);
-        proxValues.add(8.9);
-
-        macAddressList.add("E8:5H:3K:0P:1K");
-        macAddressList.add("K0:E4:N6:2J:L8");
-        macAddressList.add("M2:4J:Q1:P0:6N");
-
-        beaconImages.add(R.drawable.beaconb);
-        beaconImages.add(R.drawable.beacong);
-        beaconImages.add(R.drawable.beaconp);
+        for(int i = 0; i < 3; i ++) {
+            List<String> addressAndProx = new ArrayList<>();
+            addressAndProx.add("A1:B2:C3:D4:E5:F6");
+            addressAndProx.add(Double.toString(0.0));
+            values.put("Dud beacon/device", addressAndProx);
+        }
     }
 
     /*
@@ -113,7 +118,7 @@ public class BeaconActivity extends Activity {
     public static void addNewBeacon(String nBeaconName, String nMACAddress, double nProxValue) {
 
         if (nBeaconName == null) {
-            nBeaconName = "Unknown";
+            nBeaconName = "Unknown Beacon";
         }
 
         if(!macAddressList.contains(nMACAddress)) { // If device with new mac address

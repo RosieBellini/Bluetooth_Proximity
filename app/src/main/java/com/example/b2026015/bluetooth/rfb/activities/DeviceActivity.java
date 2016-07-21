@@ -83,13 +83,13 @@ public class DeviceActivity extends Activity {
         deviceNameList.add("Kitchen");
         deviceNameList.add("Meeting Room");
 
-        proxValues.add(6.6);
-        proxValues.add(3.2);
-        proxValues.add(8.9);
+        proxValues.add(0.0);
+        proxValues.add(0.0);
+        proxValues.add(0.0);
 
-        macAddressList.add("E8:5H:3K:0P:1K");
-        macAddressList.add("K0:E4:N6:2J:L8");
-        macAddressList.add("M2:4J:Q1:P0:6N");
+        macAddressList.add("A1:5H:3K:0P:1K");
+        macAddressList.add("B2:E4:N6:2J:L8");
+        macAddressList.add("C3:4J:Q1:P0:6N");
 
         deviceImages.add(R.drawable.deviceb);
         deviceImages.add(R.drawable.deviceg);
@@ -99,10 +99,10 @@ public class DeviceActivity extends Activity {
     /*
     Method to add a new beacon, proximity is automatically calculated from RSSI values
      */
-    public static void addNewBeacon(String nBeaconName, String nMACAddress, double nProxValue) {
+    public static void addNewDevice(String nDeviceName, String nMACAddress, double nProxValue) {
 
-        if (nBeaconName == null) {
-            nBeaconName = "Unknown";
+        if (nDeviceName == null) {
+            nDeviceName = "Unknown Device";
         }
 
         if(!macAddressList.contains(nMACAddress)) { // If device with new mac address
@@ -113,7 +113,7 @@ public class DeviceActivity extends Activity {
             deviceImages.add(deviceImages.size(), randImage);
 
             // Add device information to list
-            deviceNameList.add(deviceNameList.size(), nBeaconName);
+            deviceNameList.add(deviceNameList.size(), nDeviceName);
             macAddressList.add(macAddressList.size(), nMACAddress);
             proxValues.add(proxValues.size(), nProxValue);
         }

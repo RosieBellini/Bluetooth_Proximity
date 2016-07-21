@@ -14,25 +14,89 @@ import android.widget.Toast;
 import com.example.b2026015.bluetooth.R;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class CustomAdapter extends BaseAdapter{
-    ArrayList<String> result;
-    ArrayList<String> macaddress;
-    ArrayList<Double> proximity;
-    ArrayList<Integer> imageId;
+
+    Map<String, List<String>> deviceInfo;
+    Integer[] entityImages;
     Context context;
+
+//    ArrayList<String> result;
+//    ArrayList<String> macaddress;
+//    ArrayList<Double> proximity;
+//    ArrayList<Integer> imageId;
+
     private static LayoutInflater inflater=null;
 
-    public CustomAdapter(Activity beaconActivity, ArrayList<String> beaconNameList, ArrayList<String> macAddress, ArrayList<Double> beaconProximity, ArrayList<Integer> beaconImages) {
-        // TODO Auto-generated constructor stub
-        result=beaconNameList;
-        macaddress=macAddress;
-        context=beaconActivity;
-        imageId=beaconImages;
-        proximity=beaconProximity;
+    public CustomAdapter(Activity activity, Map<String, List<String>> pDeviceInfo, Integer[] pEntityImages) {
+        context = activity;
+        deviceInfo = pDeviceInfo;
+        entityImages = pEntityImages;
+
         inflater = ( LayoutInflater )context.
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
+
+    // Holder for layout
+    public class Holder
+    {
+        TextView deviceName;
+        TextView macAddress;
+        ImageView graphic;
+        TextView proximityValue;
+    }
+    @Override
+    public View getView(final int position, View convertView, ViewGroup parent) {
+        // TODO Auto-generated method stub
+        Holder holder=new Holder();
+        View rowView;
+        rowView = inflater.inflate(R.layout.program_list, null);
+
+        //Find views from table layout
+        holder.deviceName=(TextView) rowView.findViewById(R.id.beaconNameTextView);
+        holder.macAddress=(TextView) rowView.findViewById(R.id.beaconShortDescription);
+        holder.graphic=(ImageView) rowView.findViewById(R.id.beaconImageView);
+        holder.proximityValue=(TextView) rowView.findViewById(R.id.proximityTextView);
+
+        //Generate iterators to iterate over keys and values
+        Iterator it = deviceInfo.keySet().iterator();
+
+        for (Map.Entry<String, List<String>> key : deviceInfo.keySet()) {
+            String key = key.getKey();
+            List<String> value = entry.getValue();
+
+            // Set device name
+            holder.deviceName.setText(key);
+
+            // Set device address and proximity
+            holder.macAddress.setText(value.get(0));
+            holder.proximityValue.setText(value.get(1);
+
+            for (int i = 0; i < 2; i++) {
+                entityImages[i]
+            }
+            // ...
+        }
+
+        holder.deviceName.setText
+
+        holder.tv.setText(result.get(position));
+        holder.mac.setText(macaddress.get(position));
+        holder.prox.setText("" + proximity.get(position));
+        holder.img.setImageResource(imageId.get(position));
+        rowView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                Toast.makeText(context, "You Clicked "+result.get(position), Toast.LENGTH_LONG).show();
+            }
+        });
+        return rowView;
+    }
+
     @Override
     public int getCount() {
         // TODO Auto-generated method stub
@@ -49,37 +113,6 @@ public class CustomAdapter extends BaseAdapter{
     public long getItemId(int position) {
         // TODO Auto-generated method stub
         return position;
-    }
-
-    public class Holder
-    {
-        TextView tv;
-        TextView mac;
-        ImageView img;
-        TextView prox;
-    }
-    @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
-        // TODO Auto-generated method stub
-        Holder holder=new Holder();
-        View rowView;
-        rowView = inflater.inflate(R.layout.program_list, null);
-        holder.tv=(TextView) rowView.findViewById(R.id.beaconNameTextView);
-        holder.mac=(TextView) rowView.findViewById(R.id.beaconShortDescription);
-        holder.img=(ImageView) rowView.findViewById(R.id.beaconImageView);
-        holder.prox=(TextView) rowView.findViewById(R.id.proximityTextView);
-        holder.tv.setText(result.get(position));
-        holder.mac.setText(macaddress.get(position));
-        holder.prox.setText("" + proximity.get(position));
-        holder.img.setImageResource(imageId.get(position));
-        rowView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO Auto-generated method stub
-                Toast.makeText(context, "You Clicked "+result.get(position), Toast.LENGTH_LONG).show();
-            }
-        });
-        return rowView;
     }
 
 }

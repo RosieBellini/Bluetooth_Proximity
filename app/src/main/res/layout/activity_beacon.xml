@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:textSize="25dp"
         android:textStyle="bold"
-        android:text="Discovered Beacons"
+        android:text="Active Beacons"
         android:background="#ffffff" />
 
     <ImageButton

@@ -115,6 +115,7 @@ public class BLEDevice {
                     .build();
             filters = new ArrayList<ScanFilter>();
             mScanCallback = new ScanCallback() {
+
                 @Override
                 public void onScanResult(int callbackType, ScanResult result) {
                     if(Build.VERSION.SDK_INT >= 21) {
@@ -127,7 +128,18 @@ public class BLEDevice {
 
                         // If the device exists: add to list of known devices
                         if (device != null) {
-                            addBLEDevice(device, result.getRssi(),scanRecord);
+
+                            List<ADStructure> structures = ADPayloadParser.getInstance().parse(scanRecord);
+                            for (ADStructure structure : structures) { // Check to see if device is a beacon
+                                if(structure instanceof EddystoneUID || structure instanceof EddystoneURL || structure instanceof EddystoneTLM || structure instanceof IBeacon) {
+                                    addBLEDevice(device, result.getRssi(),scanRecord);
+                                }
+                                else {
+                                    addDevice(device, result.getRssi(),result);
+                                }
+                            }
+
+
                         }
                     }
                 }
@@ -207,21 +219,14 @@ public class BLEDevice {
         return Math.pow(10d, ((double) txPower - rssi) / (10 * 2));
     }
 
-    private void processResult(ScanResult result) {
-        System.out.println("XXXXXXX New LE Device Address: " + result.getDevice().getAddress());
-        int txPower = result.getScanRecord().getTxPowerLevel();
+    private void addDevice(BluetoothDevice device, int rssi, ScanResult result) {
 
-        System.out.println("XXXXXX txpower ::"+txPower+" and Integer.min value::"+Integer.MIN_VALUE);
-        System.out.println("XXXXXXX New LE Device Details: " + result.getDevice().getName() + " @rssi:: " + result.getRssi());
-
-        BluetoothDevice device = result.getDevice();
-        //if(device.getAddress().equals("72:7B:46:65:82:74"))
-        {
-            //System.out.println("XXXXXXXX karbonn found");
-            mDeviceMap.put(device.getAddress(), device);
+        int power = result.getScanRecord().getTxPowerLevel();
+        double distance = getDistance(rssi, power);
+        if(!DeviceActivity.deviceNameList.contains(device.getName()) && !BeaconActivity.beaconNameList.contains(device.getName())) {
+            DeviceActivity.addNewDevice(device.getName(), device.getAddress(), distance);
         }
 
-        ScanResult(scanRecord)
     }
 
 
@@ -244,7 +249,7 @@ public class BLEDevice {
                 if(!DeviceActivity.deviceNameList.contains(device.getName()) && !BeaconActivity.beaconNameList.contains(device.getName()));
                 {
                     double distance = getDistance(rssi, power);
-                    DeviceActivity.addNewBeacon(device.getName(), device.getAddress(), distance);
+                    BeaconActivity.addNewBeacon(device.getName(), device.getAddress(), distance);
                 }
 
             }
@@ -260,7 +265,7 @@ public class BLEDevice {
                 if(!DeviceActivity.deviceNameList.contains(device.getName()) && !BeaconActivity.beaconNameList.contains(device.getName()));
                 {
                     double distance = getDistance(rssi, power);
-                    DeviceActivity.addNewBeacon(device.getName(), device.getAddress(), distance);
+                    BeaconActivity.addNewBeacon(device.getName(), device.getAddress(), distance);
                 }
 
             }
@@ -288,18 +293,9 @@ public class BLEDevice {
                 if(!DeviceActivity.deviceNameList.contains(device.getName()) && !BeaconActivity.beaconNameList.contains(device.getName()));
                 {
                     double distance = getDistance(rssi, power);
-                    DeviceActivity.addNewBeacon(device.getName(), device.getAddress(), distance);
+                    BeaconActivity.addNewBeacon(device.getName(), device.getAddress(), distance);
                 }
             }
-
-            else { // Device is not a beacon
-
-
-               if (!BeaconActivity.beaconNameList.contains(device.getName()));
-            {
-                DeviceActivity.addNewBeacon(device.getName(), device.getAddress(), 4.5);
-            }
-
 
         }
     }
