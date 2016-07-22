@@ -61,37 +61,53 @@ public class CustomAdapter extends BaseAdapter{
         holder.graphic=(ImageView) rowView.findViewById(R.id.beaconImageView);
         holder.proximityValue=(TextView) rowView.findViewById(R.id.proximityTextView);
 
-        //Generate iterators to iterate over keys and values
-        Iterator it = deviceInfo.keySet().iterator();
+        // For each entry in deviceInfo Map
+        for (Map.Entry<String, List<String>> entry : deviceInfo.entrySet()) {
 
-        for (Map.Entry<String, List<String>> key : deviceInfo.keySet()) {
-            String key = key.getKey();
+            String key = entry.getKey();
             List<String> value = entry.getValue();
 
             // Set device name
             holder.deviceName.setText(key);
 
             // Set device address and proximity
-            holder.macAddress.setText(value.get(0));
-            holder.proximityValue.setText(value.get(1);
+            holder.macAddress.setText(value.get(0)); // Get MAC Address
+            holder.proximityValue.setText(value.get(1)); // Get Proximity Value
 
-            for (int i = 0; i < 2; i++) {
-                entityImages[i]
+            // Set device graphics
+            int i = 0;
+
+            if (i < 3) { // Avoids out of bounds exceptions
+                holder.graphic.setImageResource(entityImages[i]);
+                i++;
+                break;
             }
-            // ...
+            else { // i is out of bounds so reset to 0.
+                i = 0;
+                holder.graphic.setImageResource(entityImages[i]);
+            }
+            i++;
+
         }
 
-        holder.deviceName.setText
-
-        holder.tv.setText(result.get(position));
-        holder.mac.setText(macaddress.get(position));
-        holder.prox.setText("" + proximity.get(position));
-        holder.img.setImageResource(imageId.get(position));
+        // Sets click listener if device is selected
         rowView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
-                Toast.makeText(context, "You Clicked "+result.get(position), Toast.LENGTH_LONG).show();
+
+
+                for (Map.Entry<String, List<String>> entry : deviceInfo.entrySet()) {
+                    String key = entry.getKey();
+                    int i = 0;
+                    i++;
+
+                    // If i matches position on listview selected
+                    if (i == position) {
+                        Toast.makeText(context, "You Clicked "+ key, Toast.LENGTH_LONG).show();
+                    }
+                }
+
             }
         });
         return rowView;
@@ -100,7 +116,7 @@ public class CustomAdapter extends BaseAdapter{
     @Override
     public int getCount() {
         // TODO Auto-generated method stub
-        return result.size();
+        return deviceInfo.size();
     }
 
     @Override

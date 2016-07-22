@@ -12,10 +12,6 @@
 
 package com.example.b2026015.bluetooth.rfb.sensors;
 
-/**
- * Created by kyle montague on 05/12/2014.
- */
-
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -223,82 +219,81 @@ public class BLEDevice {
 
         int power = result.getScanRecord().getTxPowerLevel();
         double distance = getDistance(rssi, power);
-        if(!DeviceActivity.deviceNameList.contains(device.getName()) && !BeaconActivity.beaconNameList.contains(device.getName())) {
-            DeviceActivity.addNewDevice(device.getName(), device.getAddress(), distance);
-        }
+
+
+        // If device with MAC Address does not exist + it doesn't already exist as a beacon
+        //if(!DeviceActivity.devices.get(device.getName()).get(0).equals(device.getAddress()) && !DeviceActivity.beacons.get(device.getName()).get(0).equals(device.getAddress())) {
+            DeviceActivity.addNew(device.getName(), device.getAddress(), distance, "Nameless Device", DeviceActivity.devices);
+        //}
 
     }
 
 
-    private void addBLEDevice(BluetoothDevice device, int rssi, byte[] scanRecord){
+    private void addBLEDevice(BluetoothDevice device, int rssi, byte[] scanRecord) {
 
         List<ADStructure> structures = ADPayloadParser.getInstance().parse(scanRecord);
 
         // For each AD structure contained in the payload.
-        for (ADStructure structure : structures)
-        {
-            if (structure instanceof EddystoneUID)
-            {
+        for (ADStructure structure : structures) {
+            if (structure instanceof EddystoneUID) {
                 // Eddystone UID
-                EddystoneUID es = (EddystoneUID)structure;
+                EddystoneUID es = (EddystoneUID) structure;
                 // (1) Calibrated Tx power at 0 m.
                 //-41dBm for power at 1m
-                int power = es.getTxPower()-41;
-                mLogger.writeAsync(System.currentTimeMillis()+","+device.getAddress()+","+rssi+","+device.getName()+",,,"+power+",");//doesn't have a major, minor or uuid.
+                int power = es.getTxPower() - 41;
 
-                if(!DeviceActivity.deviceNameList.contains(device.getName()) && !BeaconActivity.beaconNameList.contains(device.getName()));
-                {
-                    double distance = getDistance(rssi, power);
-                    BeaconActivity.addNewBeacon(device.getName(), device.getAddress(), distance);
-                }
+                // Write data to log, test and add device to beacon list if appropriate
+                mLogger.writeAsync(System.currentTimeMillis() + "," + device.getAddress() + "," + rssi + "," + device.getName() + ",,," + power + ",");//doesn't have a major, minor or uuid.
+                testAndAddDevice(device, rssi, power);
 
-            }
-            else if (structure instanceof EddystoneURL)
-            {
-                // Eddystone URL
-                EddystoneURL es = (EddystoneURL)structure;
-                // (1) Calibrated Tx power at 0 m.
-                //-41dBm for power at 1m
-                int power = es.getTxPower()-41;
-                mLogger.writeAsync(System.currentTimeMillis()+","+device.getAddress()+","+rssi+","+device.getName()+",,,"+power+",");//doesn't have a major, minor or uuid.
+                } else if (structure instanceof EddystoneURL) {
+                    // Eddystone URL
+                    EddystoneURL es = (EddystoneURL) structure;
+                    // (1) Calibrated Tx power at 0 m.
+                    //-41dBm for power at 1m
+                    int power = es.getTxPower() - 41;
 
-                if(!DeviceActivity.deviceNameList.contains(device.getName()) && !BeaconActivity.beaconNameList.contains(device.getName()));
-                {
-                    double distance = getDistance(rssi, power);
-                    BeaconActivity.addNewBeacon(device.getName(), device.getAddress(), distance);
-                }
+                    mLogger.writeAsync(System.currentTimeMillis() + "," + device.getAddress() + "," + rssi + "," + device.getName() + ",,," + power + ",");//doesn't have a major, minor or uuid.
+                    testAndAddDevice(device, rssi, power);
 
-            }
-            else if (structure instanceof EddystoneTLM)
-            {
-                // Eddystone TLM
-                EddystoneTLM es = (EddystoneTLM)structure;
-                float temperature = es.getBeaconTemperature();
-                long elapsed = es.getElapsedTime();
-                int batt = es.getBatteryVoltage();
+                } else if (structure instanceof EddystoneTLM) {
+                        // Eddystone TLM
+                        EddystoneTLM es = (EddystoneTLM) structure;
+                        float temperature = es.getBeaconTemperature();
+                        long elapsed = es.getElapsedTime();
+                        int batt = es.getBatteryVoltage();
 
-            }
-            else if (structure instanceof IBeacon)
-            {
-                // iBeacon
-                IBeacon iBeacon = (IBeacon)structure;
-                String uuid = iBeacon.getUUID().toString();
-                if(uuid.equals("b9407f30-f5f8-466e-aff9-25556b57fe6d")) // if uuid is the standard estimote one, then ignore it to save space. otherwise log it, as its for the nearables.
-                    uuid = "";
-                int major = iBeacon.getMajor();
-                int minor = iBeacon.getMinor();
-                int power = iBeacon.getPower();
-                mLogger.writeAsync(System.currentTimeMillis()+","+device.getAddress()+","+rssi+","+device.getName()+","+major+","+minor+","+power+","+uuid);
+                    } else if (structure instanceof IBeacon) {
+                        // iBeacon
+                        IBeacon iBeacon = (IBeacon) structure;
+                        String uuid = iBeacon.getUUID().toString();
+                        if (uuid.equals("b9407f30-f5f8-466e-aff9-25556b57fe6d")) // if uuid is the standard estimote one, then ignore it to save space. otherwise log it, as its for the nearables.
+                            uuid = "";
+                        int major = iBeacon.getMajor();
+                        int minor = iBeacon.getMinor();
+                        int power = iBeacon.getPower();
 
-                if(!DeviceActivity.deviceNameList.contains(device.getName()) && !BeaconActivity.beaconNameList.contains(device.getName()));
-                {
-                    double distance = getDistance(rssi, power);
-                    BeaconActivity.addNewBeacon(device.getName(), device.getAddress(), distance);
+                        mLogger.writeAsync(System.currentTimeMillis() + "," + device.getAddress() + "," + rssi + "," + device.getName() + "," + major + "," + minor + "," + power + "," + uuid);
+                        testAndAddDevice(device, rssi, power);
+                    }
+
                 }
             }
 
-        }
+
+    private void testAndAddDevice(BluetoothDevice device, int rssi, int power) {
+
+        // Check that not already listed as a device or a beacon
+        //if (!DeviceActivity.devices.get(device.getName()).get(0).equals(device.getAddress()) && DeviceActivity.beacons.get(device.getName()).get(0).equals(device.getAddress())) {
+            {
+                // Calculate distance from beacon
+                double distance = getDistance(rssi, power);
+                DeviceActivity.addNew(device.getName(), device.getAddress(), distance, "Nameless Beacon", DeviceActivity.beacons);
+            }
+        //}
     }
+
+
 
     private void scanLeDevice(final boolean enable) {
 

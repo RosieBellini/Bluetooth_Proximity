@@ -24,9 +24,9 @@
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/addBeaconButton"
+        android:id="@+id/proceedButton"
         android:layout_gravity="right"
-        android:src="@android:drawable/ic_input_add"
+        android:src="@drawable/arrow"
         android:background="#ffffff" />
 
     <TextView
@@ -56,13 +56,5 @@
         android:choiceMode="singleChoice"
         android:layout_weight="1.29">
     </ListView>
-
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/pairingButton"
-        android:layout_gravity="right"
-        android:src="@drawable/arrow"
-        android:background="#ffffff" />
 
 </LinearLayout>
