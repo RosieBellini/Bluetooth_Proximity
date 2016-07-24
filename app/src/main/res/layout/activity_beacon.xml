@@ -29,8 +29,20 @@
         android:src="@android:drawable/ic_input_add"
         android:background="#ffffff" />
 
+    <com.wang.avi.AVLoadingIndicatorView
+        android:id="@+id/avloadingIndicatorViewBeacon"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:visibility="visible"
+        app:indicator="BallScaleMultiple"
+        app:indicator_color="#7D80DA"
+        android:layout_below="@+id/scanningTV"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentStart="false"
+        android:layout_gravity="center_horizontal" />
+
     <ListView
-        android:id="@+id/listView"
+        android:id="@+id/beaconListView"
         android:layout_width="fill_parent"
         android:layout_height="320dp"
         android:choiceMode="singleChoice"

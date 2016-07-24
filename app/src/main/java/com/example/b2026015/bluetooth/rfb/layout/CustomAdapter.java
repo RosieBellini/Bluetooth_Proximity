@@ -2,6 +2,7 @@ package com.example.b2026015.bluetooth.rfb.layout;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -12,42 +13,48 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.b2026015.bluetooth.R;
+import com.example.b2026015.bluetooth.rfb.entities.BLEEntity;
+import com.example.b2026015.bluetooth.rfb.entities.Beacon;
+import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 public class CustomAdapter extends BaseAdapter{
 
-    Map<String, List<String>> deviceInfo;
+    ArrayList<? extends BLEEntity> entityList;
     Integer[] entityImages;
+    String identifier;
     Context context;
-
-//    ArrayList<String> result;
-//    ArrayList<String> macaddress;
-//    ArrayList<Double> proximity;
-//    ArrayList<Integer> imageId;
 
     private static LayoutInflater inflater=null;
 
-    public CustomAdapter(Activity activity, Map<String, List<String>> pDeviceInfo, Integer[] pEntityImages) {
-        context = activity;
-        deviceInfo = pDeviceInfo;
-        entityImages = pEntityImages;
+    public CustomAdapter(Activity activity, ArrayList<? extends BLEEntity> pEntityList, Integer[] pEntityImages) {
 
+        context = activity;
+        entityList = pEntityList;
+        entityImages = pEntityImages;
         inflater = ( LayoutInflater )context.
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
     }
 
     // Holder for layout
     public class Holder
     {
+        ImageView graphic;
         TextView deviceName;
         TextView macAddress;
-        ImageView graphic;
         TextView proximityValue;
     }
+
+    public static boolean isBetween(double x, double lower, double upper) {
+        return lower <= x && x <= upper;
+    }
+
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         // TODO Auto-generated method stub
@@ -56,67 +63,46 @@ public class CustomAdapter extends BaseAdapter{
         rowView = inflater.inflate(R.layout.program_list, null);
 
         //Find views from table layout
-        holder.deviceName=(TextView) rowView.findViewById(R.id.beaconNameTextView);
-        holder.macAddress=(TextView) rowView.findViewById(R.id.beaconShortDescription);
-        holder.graphic=(ImageView) rowView.findViewById(R.id.beaconImageView);
-        holder.proximityValue=(TextView) rowView.findViewById(R.id.proximityTextView);
+        holder.graphic=(ImageView) rowView.findViewById(R.id.entityImageView);
+        holder.deviceName=(TextView) rowView.findViewById(R.id.entityNameTextView);
+        holder.macAddress=(TextView) rowView.findViewById(R.id.entityShortDescription);
+        holder.proximityValue=(TextView) rowView.findViewById(R.id.entityProximityTextView);
 
         // For each entry in deviceInfo Map
-        for (Map.Entry<String, List<String>> entry : deviceInfo.entrySet()) {
+        BLEEntity blee = (BLEEntity) entityList.get(position);
+        holder.graphic.setImageResource(blee.getIcon());
+        holder.deviceName.setText(blee.getName());
+        holder.macAddress.setText(blee.getMACAddress());
+        holder.proximityValue.setText("" + blee.getDistance());
 
-            String key = entry.getKey();
-            List<String> value = entry.getValue();
-
-            // Set device name
-            holder.deviceName.setText(key);
-
-            // Set device address and proximity
-            holder.macAddress.setText(value.get(0)); // Get MAC Address
-            holder.proximityValue.setText(value.get(1)); // Get Proximity Value
-
-            // Set device graphics
-            int i = 0;
-
-            if (i < 3) { // Avoids out of bounds exceptions
-                holder.graphic.setImageResource(entityImages[i]);
-                i++;
-                break;
-            }
-            else { // i is out of bounds so reset to 0.
-                i = 0;
-                holder.graphic.setImageResource(entityImages[i]);
-            }
-            i++;
-
-        }
-
-        // Sets click listener if device is selected
-        rowView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO Auto-generated method stub
-
-
-                for (Map.Entry<String, List<String>> entry : deviceInfo.entrySet()) {
-                    String key = entry.getKey();
-                    int i = 0;
-                    i++;
-
-                    // If i matches position on listview selected
-                    if (i == position) {
-                        Toast.makeText(context, "You Clicked "+ key, Toast.LENGTH_LONG).show();
-                    }
-                }
-
-            }
-        });
+//        double distance = blee.getDistance();
+//        if (isBetween(distance, 0.0, 3.0)) {
+//            rowView.setBackgroundResource(R.color.list_intimate_proximity);
+//        }
+//        else if (isBetween(distance, 3.0, 10.0)) {
+//            rowView.setBackgroundResource(R.color.list_close_proximity);
+//        }
+//        else {
+//            rowView.setBackgroundResource(R.color.list_far_proximity);
+//        }
+//
+//        rowView.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                // TODO Auto-generated method stub
+//
+//                Toast.makeText(context, "You Clicked "+ ((BLEEntity) entityList.get(position)).getName(), Toast.LENGTH_LONG).show();
+//
+//
+//            }
+//        });
         return rowView;
     }
 
     @Override
     public int getCount() {
         // TODO Auto-generated method stub
-        return deviceInfo.size();
+        return entityList.size();
     }
 
     @Override

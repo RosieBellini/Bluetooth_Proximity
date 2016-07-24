@@ -1,12 +1,8 @@
 package com.example.b2026015.bluetooth.rfb.activities;
 
 import java.sql.Timestamp;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+
 
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
@@ -20,21 +16,20 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 
 import com.example.b2026015.bluetooth.R;
+import com.example.b2026015.bluetooth.rfb.entities.BLEEntity;
+import com.example.b2026015.bluetooth.rfb.entities.Beacon;
+import com.example.b2026015.bluetooth.rfb.entities.Device;
 import com.example.b2026015.bluetooth.rfb.layout.CustomAdapter;
 import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
 
 public class DeviceActivity extends Activity {
 
-    ListView lv;
-    Context context;
-    CustomAdapter ca;
+    private ListView lv;
+    private Context context;
+    private static CustomAdapter ca;
 
-    public static Integer[] beaconImages = {R.drawable.beaconb, R.drawable.beacong, R.drawable.beaconp};
-    public static Integer[] deviceImages = {R.drawable.deviceb, R.drawable.deviceg, R.drawable.devicep};
-
-    public static HashMap<String, List<String>> beacons  = new HashMap<>();
-    public static HashMap<String, List<String>> devices  = new HashMap<>();
-
+    private static ArrayList<Beacon> beaconList = new ArrayList<>();
+    private static ArrayList<Device> deviceList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,29 +44,29 @@ public class DeviceActivity extends Activity {
         long mTimeStampLong = mTimeStamp.getTime();
         final BLEDevice mBLEDevice = new BLEDevice(getApplicationContext(), mTimeStampLong);
 
+        //fillValues();
+
         // Start scanning for new beacons
         mBLEDevice.start();
         startAnim();
 
-        context=this;
+        context = this;
 
         lv= (ListView) findViewById(R.id.listView);
 
-        fillValues(devices);
+        Integer[] deviceI = Device.getDeviceImages();
+        ca = new CustomAdapter(this, deviceList, deviceI);
 
-        ca = new CustomAdapter(this, devices, deviceImages);
         lv.setAdapter(ca);
-        
+
         ImageButton beaconButton = (ImageButton) findViewById(R.id.proceedButton);
         View.OnClickListener bHandler = new View.OnClickListener() {
             public void onClick(View v)
             {
                 Intent mIntent = new Intent(DeviceActivity.this, BeaconActivity.class);
 
-                // If beacons have been found
-                if(!beacons.isEmpty()) {
-                    mIntent.putExtra("BEACONS_LIST", beacons);
-                    mIntent.putExtra("BEACONS_GRAPHICS", beaconImages);
+                if(!beaconList.isEmpty()) { // If beacons have been found
+                    mIntent.putExtra("BEACONS_LIST", beaconList); // Pass beacons on to next activity
                 }
 
                 startActivity(mIntent);
@@ -90,40 +85,67 @@ public class DeviceActivity extends Activity {
     }
 
     // Fill list view with dud beacons to demonstrate it works (REMOVE)
-    public void fillValues(Map<String, List<String>> values)
+    public void fillValues()
     {
         for(int i = 0; i < 3; i ++) {
-            List<String> addressAndProx = new ArrayList<>();
-            addressAndProx.add("A1:B2:C3:D4:E5:F6");
-            addressAndProx.add(Double.toString(0.0));
-            values.put("Dud beacon/device", addressAndProx);
+            Device d = new Device(System.currentTimeMillis(), "Dud beacon/device", "A1:B2:C3:D4:E5:F6", 1.0, 2.0, 4.0);
+            deviceList.add(d);
 
             System.out.println("DUD NUMBER:" + i);
         }
     }
 
-    public static void addNew(String nEntityName, String nMACAddress, double nProxValue, String unknownString, Map<String, List<String>> entryList) {
+    public static void notifyDataChange() {
+        ca.notifyDataSetChanged();
+    }
 
-        if (nEntityName == null) {
-            nEntityName = unknownString;
+    public static boolean addNewEntity(String identifier, long pTimeStamp, String pName, String pMACAddress, double pRSSI, double pPower, double pDistance ) {
+
+        if (identifier.equals("Beacon")) {
+            Beacon nBeacon = new Beacon(pTimeStamp, pName, pMACAddress, pRSSI, pPower, pDistance);
+
+            if (beaconList.isEmpty()) {
+                beaconList.add(nBeacon);
+                return true;
+
+            } else {
+                for (Beacon beacon : beaconList) {
+                    //System.out.println("NEW:" + nBeacon.getMACAddress() + "EXISTING:" + beacon.getMACAddress());
+                    if (nBeacon.getMACAddress().contentEquals(beacon.getMACAddress()) || nBeacon.getName().contentEquals(beacon.getName())) {
+                        return false; //duplicate
+                    }
+                }
+                beaconList.add(nBeacon);
+                return true;
+            }
+
+        } else if (identifier.equals("Device")) {
+            Device nDevice = new Device(pTimeStamp, pName, pMACAddress, pRSSI, pPower, pDistance);
+            if (deviceList.isEmpty()) {
+                deviceList.add(nDevice);
+                return true;
+
+            } else {
+            for (Device device : deviceList) {
+                //System.out.println("NEW:" + nDevice.getMACAddress() + "EXISTING:" + device.getMACAddress());
+                if (nDevice.getMACAddress().contentEquals(device.getMACAddress()) || nDevice.getName().contentEquals(device.getName())) {
+                    return false; // duplicate
+                }
+            }
+            }
+            deviceList.add(nDevice);
+            return true;
+            }
+            return false; // entity was not added
         }
 
-        // Shorten name to under 15 characters, limit to two decimal places on proximity
-        if(nEntityName.length() > 15) {
-            nEntityName = nEntityName.substring(0, 15);
-        }
 
-        DecimalFormat df = new DecimalFormat("#.##");
-        df.format(nProxValue);
+    public static ArrayList<? extends BLEEntity> getBeaconList() {
+        return beaconList;
+    }
 
-        //if(!entryList.get(nEntityName).get(0).equals(nMACAddress)) { // If device with new mac address
-
-            List<String> deviceInfo = new ArrayList<>();
-            deviceInfo.add(0, nMACAddress);
-            deviceInfo.add(1, Double.toString(nProxValue));
-
-            entryList.put(nEntityName, deviceInfo);
-        //}
+    public static  ArrayList<? extends BLEEntity> getDeviceList() {
+        return deviceList;
     }
 
     private void turnOnBluetooth()
@@ -148,11 +170,11 @@ public class DeviceActivity extends Activity {
     public void onResume()
     {
         super.onResume();
-        ca = new CustomAdapter(this, devices, deviceImages);
-        lv.setAdapter(ca);
+        //ca = new CustomAdapter(this, devices, deviceImages);
+        //lv.setAdapter(ca);
         System.out.println("XXXXXXXXXXXXXXXXXX");
-        System.out.println("BEACONS:" + beacons);
-        System.out.println("DEVICES:" + devices);
+        System.out.println("BEACONS:" + beaconList);
+        System.out.println("DEVICES:" + deviceList);
         System.out.println("XXXXXXXXXXXXXXXXXX");
     }
 

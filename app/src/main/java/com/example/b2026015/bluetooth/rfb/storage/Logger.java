@@ -25,8 +25,6 @@ import java.util.ArrayList;
  */
 public class Logger {
 
-
-
     private static final String SUBTAG = "Logger: ";
 
     protected String mFolderName = Environment.getExternalStorageDirectory().getPath()+"/Traces";
