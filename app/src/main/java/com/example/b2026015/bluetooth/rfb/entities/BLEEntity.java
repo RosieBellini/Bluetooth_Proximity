@@ -1,32 +1,32 @@
 package com.example.b2026015.bluetooth.rfb.entities;
 
-import com.example.b2026015.bluetooth.rfb.activities.DeviceActivity;
-import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
-
 import java.io.Serializable;
-import java.security.Timestamp;
+import java.math.BigInteger;
 import java.text.DecimalFormat;
-import java.util.HashMap;
 
-/**
- * Created by B2026015 on 7/24/2016.
- */
 public class BLEEntity implements Serializable {
 
     protected Integer icon;
-    private long timeStamp;
+    protected long timeStamp;
     private String name;
     protected String type;
     private String MACAddress;
-    private Integer[] rssiCollection;
-    private final static int RSSI_ARRAY_SIZE = 20;
+    protected Long[] rssiCollection;
+    protected int index;
+    protected final static int RSSI_ARRAY_SIZE = 50;
     protected double rssi;
     protected double power;
     protected double distance;
 
-    public BLEEntity(long pTimeStamp, String pName, String pMACAddress, double pRSSI, double pPower, double pDistance) {
+
+    public BLEEntity(long pTimeStamp, String pName, String pMACAddress, long pRSSI, double pPower, double pDistance) {
 
         // Shorten name to under 15 characters, limit to two decimal places on distance
+
+        if(pName == null || pName.equals("")) {
+            pName = "Unnamed";
+        }
+
         if (pName.length() > 15) {
             pName = pName.substring(0, 15);
         }
@@ -34,7 +34,7 @@ public class BLEEntity implements Serializable {
         DecimalFormat df = new DecimalFormat("#.##");
         df.format(pDistance);
 
-        rssiCollection = new Integer[RSSI_ARRAY_SIZE];
+        rssiCollection = new Long[RSSI_ARRAY_SIZE];
         timeStamp = pTimeStamp;
         name = pName;
         MACAddress = pMACAddress;
@@ -68,27 +68,41 @@ public class BLEEntity implements Serializable {
         this.MACAddress = MACAddress;
     }
 
-    public void setModeRSSI(long nTimestamp) {
+    public void addRSSIReading(long nRssi) {
 
-        if (nTimestamp - timeStamp >= 3000) { // More than 3 seconds has passed, therefore need to update
-            createNewArray();
-            int nRSSI = mode(rssiCollection);
-            //distanceChanged(nRSSI);
+        if(countNonNullItems() == RSSI_ARRAY_SIZE) { // If RSSI collection is full
+            mode(rssiCollection);
+            setModeRSSI();
+            rssiCollection = new Long[RSSI_ARRAY_SIZE]; // New empty array of long to store values
+            index = 0; // Reset index to zero
         }
+        rssiCollection[index] = nRssi;
+        index++;
     }
 
-    public void createNewArray()
+    public int countNonNullItems()
     {
-        if(rssiCollection.length == RSSI_ARRAY_SIZE) {
-            rssiCollection = new Integer[RSSI_ARRAY_SIZE];
+        int counter = 0;
+        for (int i = 0; i < rssiCollection.length; i++) {
+            if (rssiCollection[i] != null)
+                counter++;
         }
+        return counter;
     }
 
-    public static int mode(Integer scans[]) {
+    public void setModeRSSI() {
 
-        int maxValue = 0, maxCount = 0;
+       rssi = mode(rssiCollection);
+
+    }
+
+    public long mode(Long[] scans) {
+
+        long maxValue = 0, maxCount = 0;
 
         for (int i = 0; i < scans.length; ++i) {
+            System.out.println(MACAddress);
+            System.out.println(scans[i]);
             int count = 0;
             for (int j = 0; j < scans.length; ++j) {
                 if (scans[j] == scans[i]) ++count;
@@ -141,8 +155,6 @@ public class BLEEntity implements Serializable {
         this.distance = distance;
     }
 
-    public void distanceChanged(int nRSSI, BLEEntity entity) {}
-
     public String getType() {
         return type;
     }
@@ -150,7 +162,5 @@ public class BLEEntity implements Serializable {
     public Integer getIcon() {
         return icon;
     }
-
-
 
 }

@@ -75,7 +75,7 @@ public class CustomAdapter extends BaseAdapter{
         holder.macAddress.setText(blee.getMACAddress());
         holder.proximityValue.setText("" + blee.getDistance());
 
-//        double distance = blee.getDistance();
+//        double distance = blee.calculateDistance();
 //        if (isBetween(distance, 0.0, 3.0)) {
 //            rowView.setBackgroundResource(R.color.list_intimate_proximity);
 //        }

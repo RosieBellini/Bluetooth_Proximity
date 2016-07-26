@@ -28,4 +28,6 @@ dependencies {
     compile 'com.wang.avi:library:1.0.5'
     compile 'com.nineoldandroids:library:2.4.0'
     compile 'com.google.android.gms:play-services-ads:9.0.2'
+    compile 'com.android.support:support-v4:23.4.0'
+    compile 'com.android.support:recyclerview-v7:23.4.0'
 }

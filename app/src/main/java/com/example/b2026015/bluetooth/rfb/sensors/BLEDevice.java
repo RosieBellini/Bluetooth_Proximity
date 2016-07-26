@@ -14,7 +14,6 @@ package com.example.b2026015.bluetooth.rfb.sensors;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.AdvertiseCallback;
 import android.bluetooth.le.AdvertiseData;
@@ -31,9 +30,7 @@ import android.os.Build;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.b2026015.bluetooth.rfb.activities.BeaconActivity;
 import com.example.b2026015.bluetooth.rfb.activities.DeviceActivity;
-import com.example.b2026015.bluetooth.rfb.entities.Device;
 import com.example.b2026015.bluetooth.rfb.storage.Logger;
 import com.neovisionaries.bluetooth.ble.advertising.ADPayloadParser;
 import com.neovisionaries.bluetooth.ble.advertising.ADStructure;
@@ -42,8 +39,6 @@ import com.neovisionaries.bluetooth.ble.advertising.EddystoneUID;
 import com.neovisionaries.bluetooth.ble.advertising.EddystoneURL;
 import com.neovisionaries.bluetooth.ble.advertising.IBeacon;
 
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -164,7 +159,7 @@ public class BLEDevice {
 
 
             if (mLEScanner == null) {
-                Toast.makeText(mContext, "BLE NOT SUPPORTED NO SCANNER", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, "PLEASE ACTIVATE BLUETOOTH", Toast.LENGTH_SHORT).show();
                 return false;
             }
         }
@@ -194,20 +189,18 @@ public class BLEDevice {
     }
 
 
-    // Device scan callback
+    // BTDevice scan callback
     private BluetoothAdapter.LeScanCallback leScanCallback = new BluetoothAdapter.LeScanCallback() {
         @Override
         public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
             if(device!=null) {
-                if(!device.getName().contains("Smappee")) { // IGNORE SMAPPEES
                 addBLEDevice(device,rssi,scanRecord);
-            }
             }
         }
     };
 
 
-    public static double getDistance(int rssi, double txPower) {
+    public static double calculateDistance(long rssi, double txPower) {
 
         /*
         * RSSI = TxPower - 10 * n * lg(d)
@@ -219,7 +212,7 @@ public class BLEDevice {
 //        double rounded = Math.round(accurateDist);
 //        return rounded;
 
-        return Math.pow(10d, ((double) txPower - rssi) / (10 * 2));
+        return Math.pow(10d, (txPower - rssi) / (10 * 2));
 
         //Math.pow(10d, ((double) txPower - rssi) / (10 * 2));
     }
@@ -227,10 +220,14 @@ public class BLEDevice {
     private static void addDevice(BluetoothDevice device, int rssi, ScanResult result) {
 
         int power = result.getScanRecord().getTxPowerLevel();
+        double distance = calculateDistance(result.getRssi(), power);
 
-        double distance = getDistance(result.getRssi(), power);
+        if(device.getAddress().equals("E5:D2:6E:EC:89:A8") || device.getAddress().equals("D2:EC:DC:D4:4F")) { // SMAAAAAAAAAAPPPPPPPPPEEEEEEEESSSSSSSS
+            DeviceActivity.addNewEntity("Beacon", System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
+            return;
+        }
 
-        DeviceActivity.addNewEntity("Device", System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
+        DeviceActivity.addNewEntity("BTDevice", System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
         DeviceActivity.notifyDataChange();
     }
 
@@ -250,7 +247,7 @@ public class BLEDevice {
 
                 // Write data to log, test and add device to beacon list if appropriate
                 mLogger.writeAsync(System.currentTimeMillis() + "," + device.getAddress() + "," + rssi + "," + device.getName() + ",,," + power + ",");//doesn't have a major, minor or uuid.
-                double distance = getDistance(rssi, power);
+                double distance = calculateDistance(rssi, power);
                 DeviceActivity.addNewEntity("Beacon", System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
 
 
@@ -262,7 +259,7 @@ public class BLEDevice {
                     int power = es.getTxPower() - 41;
 
                     mLogger.writeAsync(System.currentTimeMillis() + "," + device.getAddress() + "," + rssi + "," + device.getName() + ",,," + power + ",");//doesn't have a major, minor or uuid.
-                    double distance = getDistance(rssi, power);
+                    double distance = calculateDistance(rssi, power);
                     DeviceActivity.addNewEntity("Beacon", System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
 
             } else if (structure instanceof EddystoneTLM) {
@@ -283,7 +280,7 @@ public class BLEDevice {
                         int power = iBeacon.getPower();
 
                         mLogger.writeAsync(System.currentTimeMillis() + "," + device.getAddress() + "," + rssi + "," + device.getName() + "," + major + "," + minor + "," + power + "," + uuid);
-                        double distance = getDistance(rssi, power);
+                        double distance = calculateDistance(rssi, power);
                         DeviceActivity.addNewEntity("Beacon", System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
             }
         }

@@ -16,9 +16,8 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 
 import com.example.b2026015.bluetooth.R;
-import com.example.b2026015.bluetooth.rfb.entities.BLEEntity;
+import com.example.b2026015.bluetooth.rfb.entities.BTDevice;
 import com.example.b2026015.bluetooth.rfb.entities.Beacon;
-import com.example.b2026015.bluetooth.rfb.entities.Device;
 import com.example.b2026015.bluetooth.rfb.layout.CustomAdapter;
 import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
 
@@ -29,7 +28,7 @@ public class DeviceActivity extends Activity {
     private static CustomAdapter ca;
 
     private static ArrayList<Beacon> beaconList = new ArrayList<>();
-    private static ArrayList<Device> deviceList = new ArrayList<>();
+    private static ArrayList<BTDevice> BTDeviceList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +53,8 @@ public class DeviceActivity extends Activity {
 
         lv= (ListView) findViewById(R.id.listView);
 
-        Integer[] deviceI = Device.getDeviceImages();
-        ca = new CustomAdapter(this, deviceList, deviceI);
+        Integer[] deviceI = BTDevice.getDeviceImages();
+        ca = new CustomAdapter(this, BTDeviceList, deviceI);
 
         lv.setAdapter(ca);
 
@@ -88,8 +87,8 @@ public class DeviceActivity extends Activity {
     public void fillValues()
     {
         for(int i = 0; i < 3; i ++) {
-            Device d = new Device(System.currentTimeMillis(), "Dud beacon/device", "A1:B2:C3:D4:E5:F6", 1.0, 2.0, 4.0);
-            deviceList.add(d);
+            BTDevice d = new BTDevice(System.currentTimeMillis(), "Dud b/d", "A1:B2:C3:D4:E5:F6", 1, 2.0, 4.0);
+            BTDeviceList.add(d);
 
             System.out.println("DUD NUMBER:" + i);
         }
@@ -99,7 +98,7 @@ public class DeviceActivity extends Activity {
         ca.notifyDataSetChanged();
     }
 
-    public static boolean addNewEntity(String identifier, long pTimeStamp, String pName, String pMACAddress, double pRSSI, double pPower, double pDistance ) {
+    public static boolean addNewEntity(String identifier, long pTimeStamp, String pName, String pMACAddress, long pRSSI, double pPower, double pDistance ) {
 
         if (identifier.equals("Beacon")) {
             Beacon nBeacon = new Beacon(pTimeStamp, pName, pMACAddress, pRSSI, pPower, pDistance);
@@ -111,41 +110,46 @@ public class DeviceActivity extends Activity {
             } else {
                 for (Beacon beacon : beaconList) {
                     //System.out.println("NEW:" + nBeacon.getMACAddress() + "EXISTING:" + beacon.getMACAddress());
-                    if (nBeacon.getMACAddress().contentEquals(beacon.getMACAddress()) || nBeacon.getName().contentEquals(beacon.getName())) {
+                    if (nBeacon.getMACAddress().contentEquals(beacon.getMACAddress())) // beacon may already exist
+                    {
+                        beacon.addRSSIReading(pRSSI);
+                        //beacon exists already so add rssi value to it
                         return false; //duplicate
                     }
+                    }
+                    beaconList.add(nBeacon); // new beacon found
+                    return true; // added successfully
                 }
-                beaconList.add(nBeacon);
-                return true;
-            }
 
-        } else if (identifier.equals("Device")) {
-            Device nDevice = new Device(pTimeStamp, pName, pMACAddress, pRSSI, pPower, pDistance);
-            if (deviceList.isEmpty()) {
-                deviceList.add(nDevice);
+        } else if (identifier.equals("BTDevice")) {
+            BTDevice nBTDevice = new BTDevice(pTimeStamp, pName, pMACAddress, pRSSI, pPower, pDistance);
+
+            if (BTDeviceList.isEmpty()) {
+                BTDeviceList.add(nBTDevice);
                 return true;
 
             } else {
-            for (Device device : deviceList) {
-                //System.out.println("NEW:" + nDevice.getMACAddress() + "EXISTING:" + device.getMACAddress());
-                if (nDevice.getMACAddress().contentEquals(device.getMACAddress()) || nDevice.getName().contentEquals(device.getName())) {
-                    return false; // duplicate
+                for (BTDevice BTDevice : BTDeviceList) {
+                    //System.out.println("NEW:" + nBTDevice.getMACAddress() + "EXISTING:" + BTDevice.getMACAddress());
+                    if (nBTDevice.getMACAddress().contentEquals(BTDevice.getMACAddress())) {
+                        BTDevice.addRSSIReading(pRSSI);
+                        //beacon exists already so add rssi value to it
+                        return false; //duplicate
+                        }
+                    }
+                    }
+                    BTDeviceList.add(nBTDevice);
+                    return true;
                 }
-            }
-            }
-            deviceList.add(nDevice);
-            return true;
-            }
-            return false; // entity was not added
-        }
+        return false; // entity was not added
+    }
 
-
-    public static ArrayList<? extends BLEEntity> getBeaconList() {
+    public static ArrayList<Beacon> getBeaconList() {
         return beaconList;
     }
 
-    public static  ArrayList<? extends BLEEntity> getDeviceList() {
-        return deviceList;
+    public static  ArrayList<BTDevice> getBTDeviceList() {
+        return BTDeviceList;
     }
 
     private void turnOnBluetooth()
@@ -174,7 +178,7 @@ public class DeviceActivity extends Activity {
         //lv.setAdapter(ca);
         System.out.println("XXXXXXXXXXXXXXXXXX");
         System.out.println("BEACONS:" + beaconList);
-        System.out.println("DEVICES:" + deviceList);
+        System.out.println("DEVICES:" + BTDeviceList);
         System.out.println("XXXXXXXXXXXXXXXXXX");
     }
 
