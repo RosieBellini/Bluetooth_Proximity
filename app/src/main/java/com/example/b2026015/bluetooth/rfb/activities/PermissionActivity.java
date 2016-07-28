@@ -21,6 +21,7 @@ public class PermissionActivity extends AppCompatActivity {
         mIntent = new Intent(this, DeviceActivity.class);
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
+        // If Bluetooth isn't on - turn it on.
         if(mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
             turnOnBluetooth();
         }

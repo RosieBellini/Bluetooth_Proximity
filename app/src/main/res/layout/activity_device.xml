@@ -21,14 +21,6 @@
         android:text="Discovered Devices"
         android:background="#ffffff" />
 
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/proceedButton"
-        android:layout_gravity="right"
-        android:src="@drawable/arrow"
-        android:background="#ffffff" />
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -3,10 +3,12 @@ package com.example.b2026015.bluetooth.rfb.activities;
 import android.animation.LayoutTransition;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageButton;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.b2026015.bluetooth.R;
@@ -15,8 +17,8 @@ public class MenuActivity extends AppCompatActivity {
 
     private boolean isEnabled;
     private BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-    private ImageButton fButton, sButton, dButton;
-    private View.OnClickListener fHandler, sHandler, dHandler;
+    private Button bButton, dButton, hButton, zButton, heButton;
+    private View.OnClickListener bHandler, dHandler, hHandler, zHandler, heHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,47 +48,69 @@ public class MenuActivity extends AppCompatActivity {
 
     protected void generateButtons()
     {
-        fButton = (ImageButton) findViewById(R.id.feedbackButton);
-        sButton = (ImageButton) findViewById(R.id.sessionButton);
-        dButton = (ImageButton) findViewById(R.id.dataButton);
+        bButton = (Button) findViewById(R.id.menuBluetoothButton);
+        dButton = (Button) findViewById(R.id.menuDevicesButton);
+        hButton = (Button) findViewById(R.id.menuHistoryButton);
+        zButton = (Button) findViewById(R.id.menuZonesButton);
+        heButton = (Button) findViewById(R.id.menuHelpButton);
     }
 
     protected void generateListeners()
     {
-        fHandler = new View.OnClickListener() {
+        bHandler = new View.OnClickListener() {
             public void onClick(View v)
             {
-                Intent myIntent = new Intent(MenuActivity.this, FeedbackActivity.class);
-                //myIntent.putExtra("key", value); //Optional parameters
+                TextView bluetoothTF = (TextView) findViewById(R.id.menuBluetoothTF);
+                bluetoothTF.setTextColor(Color.parseColor("#FFFFFF"));
+                Intent myIntent = new Intent(MenuActivity.this, BluetoothActivity.class);
                 MenuActivity.this.startActivity(myIntent);
-                overridePendingTransition(android.R.anim.fade_out, android.R.anim.fade_in);
-            }
-        };
-        sHandler = new View.OnClickListener() {
-            public void onClick(View v)
-            {
-                Intent myIntent = new Intent(MenuActivity.this, SessionActivity.class);
-                //myIntent.putExtra("key", value); //Optional parameters
-                MenuActivity.this.startActivity(myIntent);
-                overridePendingTransition(android.R.anim.fade_out, android.R.anim.fade_in);
             }
         };
         dHandler = new View.OnClickListener() {
             public void onClick(View v)
             {
-                Intent myIntent = new Intent(MenuActivity.this, DataActivity.class);
-                //myIntent.putExtra("key", value); //Optional parameters
+                TextView devicesTF = (TextView) findViewById(R.id.menuProximityTF);
+                Intent myIntent = new Intent(MenuActivity.this, DeviceActivity.class);
+                devicesTF.setTextColor(Color.parseColor("#FFFFFF"));
                 MenuActivity.this.startActivity(myIntent);
-                overridePendingTransition(android.R.anim.fade_out, android.R.anim.fade_in);
+            }
+        };
+        hHandler = new View.OnClickListener() {
+            public void onClick(View v)
+            {
+                TextView historyTF = (TextView) findViewById(R.id.menuHistoryTF);
+                Intent myIntent = new Intent(MenuActivity.this, HistoryActivity.class);
+                historyTF.setTextColor(Color.parseColor("#FFFFFF"));
+                MenuActivity.this.startActivity(myIntent);
+            }
+        };
+        zHandler = new View.OnClickListener() {
+            public void onClick(View v)
+            {
+                TextView zonesTF = (TextView) findViewById(R.id.menuZonesTF);
+                Intent myIntent = new Intent(MenuActivity.this, ChangeZoneActivity.class);
+                zonesTF.setTextColor(Color.parseColor("#FFFFFF"));
+                MenuActivity.this.startActivity(myIntent);
+            }
+        };
+        heHandler = new View.OnClickListener() {
+            public void onClick(View v)
+            {
+                TextView helpTF = (TextView) findViewById(R.id.menuHelpTF);
+                Intent myIntent = new Intent(MenuActivity.this, HelpActivity.class);
+                helpTF.setTextColor(Color.parseColor("#FFFFFF"));
+                MenuActivity.this.startActivity(myIntent);
             }
         };
     }
 
     protected void assignListeners()
     {
-        fButton.setOnClickListener(fHandler);
-        sButton.setOnClickListener(sHandler);
+        bButton.setOnClickListener(bHandler);
         dButton.setOnClickListener(dHandler);
+        hButton.setOnClickListener(hHandler);
+        zButton.setOnClickListener(zHandler);
+        heButton.setOnClickListener(heHandler);
     }
 
     public void onBackPressed() {

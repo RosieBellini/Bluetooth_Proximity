@@ -30,6 +30,7 @@ import android.os.Build;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.b2026015.bluetooth.R;
 import com.example.b2026015.bluetooth.rfb.activities.DeviceActivity;
 import com.example.b2026015.bluetooth.rfb.storage.Logger;
 import com.neovisionaries.bluetooth.ble.advertising.ADPayloadParser;
@@ -48,8 +49,8 @@ public class BLEDevice {
 
     static String BLE = "BLE";
     private Context mContext;
-    private boolean isScanning = false;
-    private boolean mCanScan = false;
+    private static boolean isScanning = false;
+    private static boolean mCanScan = false;
     private Logger mLogger;
 
     private BluetoothManager bluetoothManager;
@@ -66,6 +67,10 @@ public class BLEDevice {
     private AdvertiseCallback mAdvertCallback;
     private AdvertiseSettings adSettings;
     private AdvertiseData adData;
+
+    private enum Proximity {
+        UNKNOWN, IMMEDIATE, NEAR, FAR;
+    }
 
     public static BLEDevice shared(Context context, long timestamp){
         if(mShared == null)
@@ -107,12 +112,12 @@ public class BLEDevice {
             settings = new ScanSettings.Builder()
                     .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
                     .build();
-            filters = new ArrayList<ScanFilter>();
+            filters = new ArrayList<>();
             mScanCallback = new ScanCallback() {
 
                 @Override
                 public void onScanResult(int callbackType, ScanResult result) {
-                    if(Build.VERSION.SDK_INT >= 21) {
+                    if (Build.VERSION.SDK_INT >= 21) {
 
                         // ScanResult.getDevice
                         BluetoothDevice device = result.getDevice();
@@ -126,16 +131,17 @@ public class BLEDevice {
                             // Parse scan record into advertising structure format to determine type
                             List<ADStructure> structures = ADPayloadParser.getInstance().parse(scanRecord);
                             for (ADStructure structure : structures) { // Check to see if device is a beacon
-                                if(structure instanceof EddystoneUID || structure instanceof EddystoneURL || structure instanceof EddystoneTLM || structure instanceof IBeacon) {
-                                    addBLEDevice(device, result.getRssi(),scanRecord);
-                                }
-                                else {
+                                if (structure instanceof EddystoneUID || structure instanceof EddystoneURL || structure instanceof EddystoneTLM || structure instanceof IBeacon) {
+                                    addBLEDevice(device, result.getRssi(), scanRecord);
+                                } else {
                                     addDevice(device, result.getRssi(), result);
                                 }
+
                             }
                         }
                     }
                 }
+
 
                 @Override
                 public void onBatchScanResults(List<ScanResult> results) {
@@ -168,11 +174,11 @@ public class BLEDevice {
         return true;
     }
 
-    public boolean canScan(){
+    public static boolean canScan(){
         return mCanScan;
     }
 
-    public boolean isScanning() { return isScanning; }
+    public static boolean isScanning() { return isScanning; }
 
     public void start(){
         if(canScan()) {
@@ -199,7 +205,34 @@ public class BLEDevice {
         }
     };
 
+    // Compute accuracy, returns distance in metres
+    public static double computeAccuracy(long rssi, double txPower) {
+        if(rssi == 0) {
+            return -1;
+        }
+        double ratio = (rssi*1.0/txPower);
+        double rssiCorrection = ((0.96 + Math.pow(Math.abs(rssi), 3.0)) % 10.0 / 15.0);
+        if (ratio <= 1.0) {
+            return Math.pow(ratio, 9.98)*rssiCorrection;
+        }
+        return (0.103 + 0.89978 * Math.pow(ratio, 7.71));
+    }
 
+    // Using the saem distance cutoffs as estimote
+    public static BLEDevice.Proximity proximityFromAccuracy(double accuracy)
+    {
+        if (accuracy < 0.0) {
+            return Proximity.UNKNOWN;
+        }
+        if (accuracy < 0.5) {
+            return Proximity.IMMEDIATE;
+        }
+        if (accuracy <= 3.0) {
+            return Proximity.NEAR;
+        }
+        return Proximity.FAR;
+    }
+    
     public static double calculateDistance(long rssi, double txPower) {
 
         /*
@@ -211,25 +244,23 @@ public class BLEDevice {
 
 //        double rounded = Math.round(accurateDist);
 //        return rounded;
-
-        return Math.pow(10d, (txPower - rssi) / (10 * 2));
+        Double d = Math.pow(10d, (txPower - rssi) / (10 * 2));
+        int i = d.intValue();
+        return i;
 
         //Math.pow(10d, ((double) txPower - rssi) / (10 * 2));
     }
 
-    private static void addDevice(BluetoothDevice device, int rssi, ScanResult result) {
+    // Calculate values for non-beacon devices
+    private void addDevice(BluetoothDevice device, int rssi, ScanResult result) {
 
         int power = result.getScanRecord().getTxPowerLevel();
         double distance = calculateDistance(result.getRssi(), power);
 
-        if(device.getAddress().equals("E5:D2:6E:EC:89:A8") || device.getAddress().equals("D2:EC:DC:D4:4F")) { // SMAAAAAAAAAAPPPPPPPPPEEEEEEEESSSSSSSS
-            DeviceActivity.addNewEntity("Beacon", System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
-            return;
+            mLogger.writeAsync(System.currentTimeMillis() + "," + device.getAddress() + "," + rssi + "," + device.getName() + ",,," + power + ",");
+            DeviceActivity.addNewEntity(System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
+            DeviceActivity.notifyDataChange();
         }
-
-        DeviceActivity.addNewEntity("BTDevice", System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
-        DeviceActivity.notifyDataChange();
-    }
 
 
     private void addBLEDevice(BluetoothDevice device, int rssi, byte[] scanRecord) {
@@ -248,7 +279,7 @@ public class BLEDevice {
                 // Write data to log, test and add device to beacon list if appropriate
                 mLogger.writeAsync(System.currentTimeMillis() + "," + device.getAddress() + "," + rssi + "," + device.getName() + ",,," + power + ",");//doesn't have a major, minor or uuid.
                 double distance = calculateDistance(rssi, power);
-                DeviceActivity.addNewEntity("Beacon", System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
+                DeviceActivity.addNewEntity(System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
 
 
             } else if (structure instanceof EddystoneURL) {
@@ -260,7 +291,7 @@ public class BLEDevice {
 
                     mLogger.writeAsync(System.currentTimeMillis() + "," + device.getAddress() + "," + rssi + "," + device.getName() + ",,," + power + ",");//doesn't have a major, minor or uuid.
                     double distance = calculateDistance(rssi, power);
-                    DeviceActivity.addNewEntity("Beacon", System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
+                    DeviceActivity.addNewEntity(System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
 
             } else if (structure instanceof EddystoneTLM) {
                         // Eddystone TLM
@@ -281,7 +312,7 @@ public class BLEDevice {
 
                         mLogger.writeAsync(System.currentTimeMillis() + "," + device.getAddress() + "," + rssi + "," + device.getName() + "," + major + "," + minor + "," + power + "," + uuid);
                         double distance = calculateDistance(rssi, power);
-                        DeviceActivity.addNewEntity("Beacon", System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
+                        DeviceActivity.addNewEntity(System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
             }
         }
     }

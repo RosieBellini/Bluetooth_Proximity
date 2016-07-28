@@ -2,37 +2,28 @@ package com.example.b2026015.bluetooth.rfb.layout;
 
 import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.b2026015.bluetooth.R;
-import com.example.b2026015.bluetooth.rfb.entities.BLEEntity;
-import com.example.b2026015.bluetooth.rfb.entities.Beacon;
-import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
+import com.example.b2026015.bluetooth.rfb.entities.BTDevice;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 public class CustomAdapter extends BaseAdapter{
 
-    ArrayList<? extends BLEEntity> entityList;
+    ArrayList<BTDevice> entityList;
     Integer[] entityImages;
     String identifier;
     Context context;
 
     private static LayoutInflater inflater=null;
 
-    public CustomAdapter(Activity activity, ArrayList<? extends BLEEntity> pEntityList, Integer[] pEntityImages) {
+    public CustomAdapter(Activity activity, ArrayList<BTDevice> pEntityList, Integer[] pEntityImages) {
 
         context = activity;
         entityList = pEntityList;
@@ -48,11 +39,8 @@ public class CustomAdapter extends BaseAdapter{
         ImageView graphic;
         TextView deviceName;
         TextView macAddress;
+        TextView proximityZone;
         TextView proximityValue;
-    }
-
-    public static boolean isBetween(double x, double lower, double upper) {
-        return lower <= x && x <= upper;
     }
 
     @Override
@@ -66,14 +54,16 @@ public class CustomAdapter extends BaseAdapter{
         holder.graphic=(ImageView) rowView.findViewById(R.id.entityImageView);
         holder.deviceName=(TextView) rowView.findViewById(R.id.entityNameTextView);
         holder.macAddress=(TextView) rowView.findViewById(R.id.entityShortDescription);
+        holder.proximityZone=(TextView) rowView.findViewById(R.id.proximityZoneTextView);
         holder.proximityValue=(TextView) rowView.findViewById(R.id.entityProximityTextView);
 
         // For each entry in deviceInfo Map
-        BLEEntity blee = (BLEEntity) entityList.get(position);
-        holder.graphic.setImageResource(blee.getIcon());
-        holder.deviceName.setText(blee.getName());
-        holder.macAddress.setText(blee.getMACAddress());
-        holder.proximityValue.setText("" + blee.getDistance());
+        BTDevice bt = (BTDevice) entityList.get(position);
+        holder.graphic.setImageResource(bt.getIcon());
+        holder.deviceName.setText(bt.getName());
+        holder.macAddress.setText(bt.getMACAddress());
+        holder.proximityZone.setText(bt.getProximityBand(bt.getDistance()));
+        holder.proximityValue.setText("" + bt.getDistance());
 
 //        double distance = blee.calculateDistance();
 //        if (isBetween(distance, 0.0, 3.0)) {

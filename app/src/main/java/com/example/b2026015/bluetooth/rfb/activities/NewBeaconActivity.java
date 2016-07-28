@@ -37,15 +37,15 @@
 //                String inputedBLN = bLN.getText().toString();
 //                String inputedMAC = mAD.getText().toString();
 //
-//                Random rand = new Random();
-//                int randImage = BeaconActivity.bBeaconImages[rand.nextInt(3)];
-//
-//                BeaconActivity.bBeaconImages.add(BeaconActivity.bBeaconImages.size(), randImage);
-//                BeaconActivity.beaconNameList.add(BeaconActivity.beaconNameList.size(), inputedBLN);
-//
-//                //Calculate proximity distance here//
-//                double nProxValue = 4.5;
-//                DeviceActivity.proxValues.add(DeviceActivity.proxValues.size(), nProxValue);
+////                Random rand = new Random();
+////                int randImage = BeaconActivity.bBeaconImages[rand.nextInt(3)];
+////
+////                BeaconActivity.bBeaconImages.add(BeaconActivity.bBeaconImages.size(), randImage);
+////                BeaconActivity.beaconNameList.add(BeaconActivity.beaconNameList.size(), inputedBLN);
+////
+////                //Calculate proximity distance here//
+////                double nProxValue = 4.5;
+////                DeviceActivity.proxValues.add(DeviceActivity.proxValues.size(), nProxValue);
 //
 //                finish();
 //            }

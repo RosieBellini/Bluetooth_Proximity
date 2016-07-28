@@ -3,6 +3,7 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="white">#FFFFFF</color>
     <color name="list_intimate_proximity">#d8ccda</color>
     <color name="list_close_proximity">#d0e2d8</color>
     <color name="list_far_proximity">#e2debd</color>

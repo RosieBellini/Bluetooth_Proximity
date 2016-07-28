@@ -2,6 +2,13 @@ package com.example.b2026015.bluetooth.rfb.activities;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 
 import android.bluetooth.BluetoothAdapter;
@@ -12,22 +19,20 @@ import android.content.Context;
 import android.view.Menu;
 
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.b2026015.bluetooth.R;
 import com.example.b2026015.bluetooth.rfb.entities.BTDevice;
-import com.example.b2026015.bluetooth.rfb.entities.Beacon;
 import com.example.b2026015.bluetooth.rfb.layout.CustomAdapter;
 import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
 
 public class DeviceActivity extends Activity {
 
     private ListView lv;
-    private Context context;
+    private Context mContext;
     private static CustomAdapter ca;
 
-    private static ArrayList<Beacon> beaconList = new ArrayList<>();
     private static ArrayList<BTDevice> BTDeviceList = new ArrayList<>();
 
     @Override
@@ -43,37 +48,48 @@ public class DeviceActivity extends Activity {
         long mTimeStampLong = mTimeStamp.getTime();
         final BLEDevice mBLEDevice = new BLEDevice(getApplicationContext(), mTimeStampLong);
 
-        //fillValues();
-
         // Start scanning for new beacons
         mBLEDevice.start();
         startAnim();
 
-        context = this;
-
+        // Receive context and listview for use for adapter
+        mContext = this;
         lv= (ListView) findViewById(R.id.listView);
 
+        // Assign custom adapter to fill list with devices + random images
         Integer[] deviceI = BTDevice.getDeviceImages();
         ca = new CustomAdapter(this, BTDeviceList, deviceI);
-
         lv.setAdapter(ca);
 
-        ImageButton beaconButton = (ImageButton) findViewById(R.id.proceedButton);
-        View.OnClickListener bHandler = new View.OnClickListener() {
-            public void onClick(View v)
-            {
-                Intent mIntent = new Intent(DeviceActivity.this, BeaconActivity.class);
+        // Proximity Calculator
+        final ProximityComparator pc = new ProximityComparator();
 
-                if(!beaconList.isEmpty()) { // If beacons have been found
-                    mIntent.putExtra("BEACONS_LIST", beaconList); // Pass beacons on to next activity
-                }
-
-                startActivity(mIntent);
-                overridePendingTransition(android.R.anim.fade_out, android.R.anim.fade_in);
+        //Runnable dedicated to continuously check proximity in order to reorder devices according to proximity
+        Runnable proximityRunnable = new Runnable() {
+            public void run() {
+                Collections.sort(BTDeviceList, pc);
+                ca.notifyDataSetChanged();
             }
         };
 
-        beaconButton.setOnClickListener(bHandler);
+        // Schedule reordering every 2 seconds
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+        executor.scheduleAtFixedRate(proximityRunnable, 0, 2, TimeUnit.SECONDS);
+
+
+        Runnable detectBTRunnable = new Runnable() {
+            public void run() {
+                if (!BLEDevice.isScanning()) {
+                    Toast.makeText(mContext, "PLEASE ACTIVATE BLUETOOTH", Toast.LENGTH_SHORT).show();
+                    stopAnim();
+                } else
+                    startAnim();
+            }
+        };
+
+        // Schedule check every 2 seconds
+        executor.scheduleAtFixedRate(detectBTRunnable, 0, 2, TimeUnit.SECONDS);
+
     }
 
     @Override
@@ -83,69 +99,24 @@ public class DeviceActivity extends Activity {
         return true;
     }
 
-    // Fill list view with dud beacons to demonstrate it works (REMOVE)
-    public void fillValues()
-    {
-        for(int i = 0; i < 3; i ++) {
-            BTDevice d = new BTDevice(System.currentTimeMillis(), "Dud b/d", "A1:B2:C3:D4:E5:F6", 1, 2.0, 4.0);
-            BTDeviceList.add(d);
-
-            System.out.println("DUD NUMBER:" + i);
-        }
-    }
-
     public static void notifyDataChange() {
         ca.notifyDataSetChanged();
     }
 
-    public static boolean addNewEntity(String identifier, long pTimeStamp, String pName, String pMACAddress, long pRSSI, double pPower, double pDistance ) {
+    public static boolean addNewEntity(long pTimeStamp, String pName, String pMACAddress, long pRSSI, double pPower, double pDistance ) {
 
-        if (identifier.equals("Beacon")) {
-            Beacon nBeacon = new Beacon(pTimeStamp, pName, pMACAddress, pRSSI, pPower, pDistance);
+        BTDevice mBTDevice = new BTDevice(pTimeStamp, pName, pMACAddress, pRSSI, pPower, pDistance);
 
-            if (beaconList.isEmpty()) {
-                beaconList.add(nBeacon);
-                return true;
+        for (BTDevice BTDevice : BTDeviceList) {
+            if (mBTDevice.getMACAddress().contentEquals(BTDevice.getMACAddress())) {
+                //beacon exists already so add rssi value to it
+                BTDevice.addRSSIReading(pRSSI);
 
-            } else {
-                for (Beacon beacon : beaconList) {
-                    //System.out.println("NEW:" + nBeacon.getMACAddress() + "EXISTING:" + beacon.getMACAddress());
-                    if (nBeacon.getMACAddress().contentEquals(beacon.getMACAddress())) // beacon may already exist
-                    {
-                        beacon.addRSSIReading(pRSSI);
-                        //beacon exists already so add rssi value to it
-                        return false; //duplicate
-                    }
-                    }
-                    beaconList.add(nBeacon); // new beacon found
-                    return true; // added successfully
-                }
-
-        } else if (identifier.equals("BTDevice")) {
-            BTDevice nBTDevice = new BTDevice(pTimeStamp, pName, pMACAddress, pRSSI, pPower, pDistance);
-
-            if (BTDeviceList.isEmpty()) {
-                BTDeviceList.add(nBTDevice);
-                return true;
-
-            } else {
-                for (BTDevice BTDevice : BTDeviceList) {
-                    //System.out.println("NEW:" + nBTDevice.getMACAddress() + "EXISTING:" + BTDevice.getMACAddress());
-                    if (nBTDevice.getMACAddress().contentEquals(BTDevice.getMACAddress())) {
-                        BTDevice.addRSSIReading(pRSSI);
-                        //beacon exists already so add rssi value to it
-                        return false; //duplicate
-                        }
-                    }
-                    }
-                    BTDeviceList.add(nBTDevice);
-                    return true;
-                }
-        return false; // entity was not added
-    }
-
-    public static ArrayList<Beacon> getBeaconList() {
-        return beaconList;
+                return false; //duplicate
+            }
+        }
+        BTDeviceList.add(mBTDevice);
+        return true;
     }
 
     public static  ArrayList<BTDevice> getBTDeviceList() {
@@ -174,20 +145,25 @@ public class DeviceActivity extends Activity {
     public void onResume()
     {
         super.onResume();
-        //ca = new CustomAdapter(this, devices, deviceImages);
-        //lv.setAdapter(ca);
-        System.out.println("XXXXXXXXXXXXXXXXXX");
-        System.out.println("BEACONS:" + beaconList);
-        System.out.println("DEVICES:" + BTDeviceList);
-        System.out.println("XXXXXXXXXXXXXXXXXX");
+        ca.notifyDataSetChanged();
     }
 
+    public class ProximityComparator implements Comparator<BTDevice> {
 
+        @Override
+        public int compare(BTDevice o1, BTDevice o2) {
 
+            Double d = o1.getDistance();
+            Double d2 = o2.getDistance();
+            Integer i = d.intValue();
+            Integer i2 = d2.intValue();
 
-
+            if( i > i2 )
+                return 1;
+            else if( i < i2 )
+                return -1;
+            else
+                return 0;
+        }
+    }
 }
-
-
-
-

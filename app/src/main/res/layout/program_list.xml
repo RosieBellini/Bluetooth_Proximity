@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
-    android:padding="7dp">
+    android:padding="5dp">
 
     <ImageView
         android:id="@+id/entityImageView"
@@ -18,7 +18,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="7dp">
+        android:padding="7dp"
+        android:weightSum="1">
 
         <TextView
             android:id="@+id/entityNameTextView"
@@ -28,18 +29,24 @@
             android:textStyle="bold" />
 
         <TextView
-            android:layout_width="25dp"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:id="@+id/entityProximityTextView"
-            android:layout_gravity="right" />
-
-        <TextView
             android:id="@+id/entityShortDescription"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="5dp"
             android:textSize="12sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:id="@+id/proximityZoneTextView" />
+
+        <TextView
+            android:layout_width="51dp"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:id="@+id/entityProximityTextView"
+            android:layout_gravity="right" />
 
     </LinearLayout>
 </LinearLayout>
