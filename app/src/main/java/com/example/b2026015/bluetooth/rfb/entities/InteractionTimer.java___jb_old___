@@ -1,0 +1,34 @@
+package com.example.b2026015.bluetooth.rfb.entities;
+
+import java.security.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class InteractionTimer {
+
+    private String dateStart;
+    private String dateFinish;
+    private long startedAt;
+    private long finishedAt;
+    private long interactionLength;
+    private DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+
+    public InteractionTimer(long commence) {
+        dateStart = new Date();
+        startedAt = commence;
+
+    }
+
+    public long endTimer(long finish) {
+
+        finishedAt = finish - startedAt;
+        return finishedAt;
+    }
+
+    public String getDate() {
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        Date date = new Date();
+        return dateFormat.format(date); //29/07/2016 15:59:48
+    }
+}

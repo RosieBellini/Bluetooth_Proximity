@@ -35,9 +35,6 @@ public class DeviceActivity extends Activity {
     private Context mContext;
     private static CustomAdapter ca;
     private static boolean started;
-
-    private Bundle btdDeviceBundle;
-
     private static ArrayList<BTDevice> BTDeviceList = new ArrayList<>();
 
     @Override
@@ -47,11 +44,6 @@ public class DeviceActivity extends Activity {
         setContentView(R.layout.activity_device);
 
         BTDeviceList = BLEScanningService.getBTDeviceList();
-
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            BTDeviceList = getIntent().getParcelableArrayListExtra("key");
-        }
 
         // Turn on bluetooth if not on already
         turnOnBluetooth();

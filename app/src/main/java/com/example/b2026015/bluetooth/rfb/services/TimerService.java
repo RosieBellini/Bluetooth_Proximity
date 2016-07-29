@@ -25,7 +25,9 @@ import java.util.ArrayList;
 
 public class TimerService extends Service {
 
+    // String to hold type of social interaction
     private String encounterType;
+    // Arraylist for close proximity devices
     private static ArrayList<BTDevice> closeProxBTDevices;
     private final IBinder mBinder = new LocalBinder();
 

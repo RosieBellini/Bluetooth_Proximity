@@ -45,6 +45,7 @@ import java.util.List;
 public class BLEDevice {
 
     private String TAG = "BLEDevice";
+    private String thisDeviceAddress;
 
     static String BLE = "BLE";
     private Context mContext;
@@ -92,6 +93,9 @@ public class BLEDevice {
         }
         bluetoothManager = (BluetoothManager) mContext.getSystemService(Context.BLUETOOTH_SERVICE);
         bluetoothAdapter = bluetoothManager.getAdapter();
+
+        thisDeviceAddress = bluetoothAdapter.getAddress();
+        System.out.println("THIS ADDRESS IS:" + thisDeviceAddress);
 
 
         // If OS is Lollipop or below
