@@ -42,10 +42,6 @@ public class HelpActivity extends AppCompatActivity implements AboutCTBFragment.
                 TextView bluetoothTF = (TextView) findViewById(R.id.aboutBluetoothTF);
                 bluetoothTF.setTextColor(Color.parseColor("#FFFFFF"));
 
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .add(R.id.container, AboutBLEFragment.newInstance(), "BLEFrag")
-                        .commit();
                 ;
             }
         };
@@ -54,10 +50,6 @@ public class HelpActivity extends AppCompatActivity implements AboutCTBFragment.
                 TextView devicesTF = (TextView) findViewById(R.id.aboutProximityTF);
                 devicesTF.setTextColor(Color.parseColor("#FFFFFF"));
 
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .add(R.id.container, AboutProximityFragment.newInstance(), "ProxFrag")
-                        .commit();
             }
         };
         cHandler = new View.OnClickListener() {
@@ -65,10 +57,6 @@ public class HelpActivity extends AppCompatActivity implements AboutCTBFragment.
                 TextView historyTF = (TextView) findViewById(R.id.aboutCLBTF);
                 historyTF.setTextColor(Color.parseColor("#FFFFFF"));
 
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .add(R.id.container, AboutCTBFragment.newInstance(), "CTBFrag")
-                        .commit();
             }
         };
     }

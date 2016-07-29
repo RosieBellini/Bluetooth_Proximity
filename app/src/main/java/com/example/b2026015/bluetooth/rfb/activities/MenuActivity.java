@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.b2026015.bluetooth.R;
+import com.example.b2026015.bluetooth.rfb.services.TimerService;
 
 public class MenuActivity extends AppCompatActivity {
 
@@ -29,6 +30,9 @@ public class MenuActivity extends AppCompatActivity {
         generateButtons();
         generateListeners();
         assignListeners();
+
+        Intent serviceIntent = new Intent(this, TimerService.class);
+        this.startService(serviceIntent);
 
         if(BluetoothAdapter.getDefaultAdapter().getState() != BluetoothAdapter.STATE_ON)
         {
@@ -116,4 +120,6 @@ public class MenuActivity extends AppCompatActivity {
     public void onBackPressed() {
         // Disallow back button pressed to avoid returning to permission page
     }
+
+
 }

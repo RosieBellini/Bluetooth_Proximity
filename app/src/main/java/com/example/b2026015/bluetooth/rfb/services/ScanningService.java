@@ -1,18 +1,13 @@
 package com.example.b2026015.bluetooth.rfb.services;
 
-import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
+
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
-
-import com.example.b2026015.bluetooth.R;
-import com.example.b2026015.bluetooth.rfb.activities.FeedbackActivity;
+import com.example.b2026015.bluetooth.rfb.activities.DeviceActivity;
 import com.example.b2026015.bluetooth.rfb.entities.BTDevice;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ScanningService extends Service {
@@ -20,6 +15,9 @@ public class ScanningService extends Service {
     private boolean inRange;
 
     public ScanningService() {
+
+        ArrayList<BTDevice> btDeviceArrayList = DeviceActivity.getBTDeviceList();
+
     }
 
     @Override
@@ -29,10 +27,12 @@ public class ScanningService extends Service {
     }
 
     public void enteredZone(String zone, List<BTDevice> btdevices) {
+
         inRange = true;
     }
 
     public void exitedZone(String zone) {
+
         inRange = false;
     }
 

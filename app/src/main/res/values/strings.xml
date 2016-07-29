@@ -18,6 +18,7 @@
     <string name="help_activity_closetoblue_option">About CloseToBlue</string>
     <string name="ble_long_description">
 
+        <html>
          <![CDATA[
         <h1>About Bluetooth Low Energy. \n\n</h1>
         <h2>Information correct as of August 2016</h2>
@@ -35,6 +36,7 @@
         <li>GNU/Linux Vanilla BlueZ 4.93+</li>
         </ul>
         ]]>
+        </html>
 
         "About Bluetooth Low Energy.\n\n"
 
@@ -54,6 +56,12 @@
 
 
     <string name="title_activity_pairing">PairingActivity</string>
+
+
+
+    <string name="notification_text">Have you just had an interaction with someone?</string>
+    <string name="question_mark">\?</string>
+
 
     <string name="action_settings">Settings</string>
     <string name="title_activity_beacon_popup">BeaconPopup</string>

@@ -72,10 +72,9 @@ public class DeviceActivity extends Activity {
             }
         };
 
-        // Schedule reordering every 2 seconds
+        // Schedule reordering every second
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-        executor.scheduleAtFixedRate(proximityRunnable, 0, 2, TimeUnit.SECONDS);
-
+        executor.scheduleAtFixedRate(proximityRunnable, 0, 1, TimeUnit.SECONDS);
 
         Runnable detectBTRunnable = new Runnable() {
             public void run() {
@@ -116,10 +115,11 @@ public class DeviceActivity extends Activity {
             }
         }
         BTDeviceList.add(mBTDevice);
+        ca.notifyDataSetChanged();
         return true;
     }
 
-    public static  ArrayList<BTDevice> getBTDeviceList() {
+    public static ArrayList<BTDevice> getBTDeviceList() {
         return BTDeviceList;
     }
 
@@ -148,6 +148,12 @@ public class DeviceActivity extends Activity {
         ca.notifyDataSetChanged();
     }
 
+
+
+
+
+
+    // Comparator class for organising bluetooth low energy devices by proximity values
     public class ProximityComparator implements Comparator<BTDevice> {
 
         @Override
@@ -155,12 +161,10 @@ public class DeviceActivity extends Activity {
 
             Double d = o1.getDistance();
             Double d2 = o2.getDistance();
-            Integer i = d.intValue();
-            Integer i2 = d2.intValue();
 
-            if( i > i2 )
+            if( d > d2 )
                 return 1;
-            else if( i < i2 )
+            else if( d < d2 )
                 return -1;
             else
                 return 0;

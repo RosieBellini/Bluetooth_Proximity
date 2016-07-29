@@ -1,35 +1,41 @@
 package com.example.b2026015.bluetooth.rfb.entities;
 
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.example.b2026015.bluetooth.R;
 import com.example.b2026015.bluetooth.rfb.activities.DeviceActivity;
 import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.Random;
 
 /**
  * Created by B2026015 on 7/24/2016.
  */
-public class BTDevice {
+public class BTDevice implements Parcelable {
 
     private Integer icon;
     private long timeStamp;
     private String name;
     private String MACAddress;
-    private Long[] rssiCollection;
+    private long[] rssiCollection;
     private int index;
     private final static int RSSI_ARRAY_SIZE = 50;
     private double rssi;
     private double power;
     private double distance;
     private String proxBand;
+    private int mData;
 
     private double immediate = 2.0;
-    private double near = 10.0;
-    private double far = 70.0;
+    private double near = 5.0;
+    private double far = 15.0;
 
     private static Integer[] deviceImages = {R.drawable.deviceb, R.drawable.deviceg, R.drawable.devicep};
-
 
     public BTDevice(long pTimeStamp, String pName, String pMACAddress, long pRSSI, double pPower, double pDistance ) {
 
@@ -41,16 +47,13 @@ public class BTDevice {
             pName = pName.substring(0, 15);
         }
 
-        DecimalFormat df = new DecimalFormat("#.##");
-        df.format(pDistance);
-
-        rssiCollection = new Long[RSSI_ARRAY_SIZE];
+        rssiCollection = new long[RSSI_ARRAY_SIZE];
         timeStamp = pTimeStamp;
         name = pName;
         MACAddress = pMACAddress;
         rssi = pRSSI;
         power = pPower;
-        distance = pDistance;
+        setDistance(pDistance);
         icon = deviceImages[new Random().nextInt(3)];
         proxBand = getProximityBand(distance);
     }
@@ -61,11 +64,8 @@ public class BTDevice {
         if(countNonNullItems() == RSSI_ARRAY_SIZE) { // If RSSI collection is full
 
             setModeRSSI();
-            System.out.print("MODE OF ARRAY CALCULATED:" + mode(rssiCollection));
-            System.out.print("RSSI SET:" + rssi);
-
             distanceChanged(mode(rssiCollection));
-            rssiCollection = new Long[RSSI_ARRAY_SIZE]; // New empty array of long to store values
+            rssiCollection = new long[RSSI_ARRAY_SIZE]; // New empty array of long to store values
             index = 0; // Reset index to zero
         }
         rssiCollection[index] = nRssi;
@@ -74,13 +74,11 @@ public class BTDevice {
     }
 
     // Find mode of RSSI values collected
-    public long mode(Long[] scans) {
+    public long mode(long[] scans) {
 
         long maxValue = 0, maxCount = 0;
 
         for (int i = 0; i < scans.length; ++i) {
-            System.out.println(MACAddress);
-            System.out.println(scans[i]);
             int count = 0;
             for (int j = 0; j < scans.length; ++j) {
                 if (scans[j] == scans[i]) ++count;
@@ -105,7 +103,7 @@ public class BTDevice {
     {
         int counter = 0;
         for (int i = 0; i < rssiCollection.length; i++) {
-            if (rssiCollection[i] != null)
+            if (rssiCollection[i] != 0) // Changed from null (originally Long[])
                 counter++;
         }
         return counter;
@@ -113,22 +111,30 @@ public class BTDevice {
 
     // Set distance
     public void setDistance(double pDistance) {
-        distance = pDistance;
+        proxBand = getProximityBand(pDistance);
+        String sDistance = String.valueOf(pDistance);
+        distance = Double.parseDouble(sDistance.substring(0, Math.min(sDistance.length(), 3)));
+    }
+
+    public static double round(double value) {
+        DecimalFormat df = new DecimalFormat("#.#");
+        String sFormat = df.format(value);
+        return Double.parseDouble(sFormat);
     }
 
 
     // Set newly calculated distance as a result of RSSI values, notifies List Adapter that values have changed
     public void distanceChanged(long nRSSI) {
-        setDistance(BLEDevice.calculateDistance(nRSSI, power));
+        setDistance(BLEDevice.computeAccuracy(nRSSI, power));
         DeviceActivity.notifyDataChange();
     }
 
     public String getProximityBand(double pDistance) {
-        if (pDistance < immediate) {
+        if (pDistance <= immediate) {
             String im = "Immediate";
             return im;
         }
-        else if (immediate < pDistance && pDistance < near) {
+        else if (immediate < pDistance && pDistance <= near) {
             String ne = "Near";
             return ne;
         }
@@ -171,5 +177,49 @@ public class BTDevice {
         return deviceImages;
     }
 
+    public String getProxBand() {
+        return proxBand;
+    }
+
+    public BTDevice(Parcel in) {
+        readFromParcel(in);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    // write your object's data to the passed-in Parcel
+    @Override
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeInt(mData);
+    }
+
+    // this is used to regenerate your object. All Parcelables must have a CREATOR that implements these two methods
+    public static final Parcelable.Creator<BTDevice> CREATOR = new Parcelable.Creator<BTDevice>() {
+        public BTDevice createFromParcel(Parcel in) {
+            return new BTDevice(in);
+        }
+
+        public BTDevice[] newArray(int size) {
+            return new BTDevice[size];
+        }
+    };
+
+    // Called from constructor to create this object from a parcel
+    public void readFromParcel(Parcel dest) {
+
+        rssiCollection = dest.createLongArray(); // CREATE instead of read
+        timeStamp = dest.readLong();
+        name = dest.readString();
+        MACAddress = dest.readString();
+        rssi = dest.readDouble();
+        power = dest.readDouble();
+        distance = dest.readDouble();
+        icon = dest.readInt();
+        proxBand = dest.readString();
+
+    }
 }
 

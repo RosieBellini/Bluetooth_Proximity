@@ -218,7 +218,7 @@ public class BLEDevice {
         return (0.103 + 0.89978 * Math.pow(ratio, 7.71));
     }
 
-    // Using the saem distance cutoffs as estimote
+    // Using the same distance cutoffs as estimote
     public static BLEDevice.Proximity proximityFromAccuracy(double accuracy)
     {
         if (accuracy < 0.0) {
@@ -232,7 +232,7 @@ public class BLEDevice {
         }
         return Proximity.FAR;
     }
-    
+
     public static double calculateDistance(long rssi, double txPower) {
 
         /*
@@ -255,7 +255,8 @@ public class BLEDevice {
     private void addDevice(BluetoothDevice device, int rssi, ScanResult result) {
 
         int power = result.getScanRecord().getTxPowerLevel();
-        double distance = calculateDistance(result.getRssi(), power);
+        double distance = computeAccuracy(rssi, power);
+        //double distance = calculateDistance(result.getRssi(), power);
 
             mLogger.writeAsync(System.currentTimeMillis() + "," + device.getAddress() + "," + rssi + "," + device.getName() + ",,," + power + ",");
             DeviceActivity.addNewEntity(System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
