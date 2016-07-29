@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.b2026015.bluetooth.R;
+import com.example.b2026015.bluetooth.rfb.services.BLEScanningService;
 import com.example.b2026015.bluetooth.rfb.services.TimerService;
 
 public class MenuActivity extends AppCompatActivity {
@@ -31,8 +32,10 @@ public class MenuActivity extends AppCompatActivity {
         generateListeners();
         assignListeners();
 
-        Intent serviceIntent = new Intent(this, TimerService.class);
-        this.startService(serviceIntent);
+        Intent sServiceIntent = new Intent(this, TimerService.class);
+        Intent tServiceIntent = new Intent(this, BLEScanningService.class);
+        this.startService(sServiceIntent);
+        this.startService(tServiceIntent);
 
         if(BluetoothAdapter.getDefaultAdapter().getState() != BluetoothAdapter.STATE_ON)
         {

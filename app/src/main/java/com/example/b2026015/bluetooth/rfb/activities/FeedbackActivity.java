@@ -95,7 +95,7 @@ public class FeedbackActivity extends AppCompatActivity {
     public void onNewIntent(Intent intent){
         Bundle extras = intent.getExtras();
         if(extras != null){
-            if(extras.containsKey("encounter_casual"))
+            if(extras.containsKey("INTENT_ENCOUNTER_CASUAL"))
             {
                 setLayoutCasual();
                 // extract the extra-data in the Notification
@@ -103,7 +103,7 @@ public class FeedbackActivity extends AppCompatActivity {
                 //txtView = (TextView) findViewById(R.id.txtMessage);
                 //txtView.setText(msg);
             }
-            else if(extras.containsKey("encounter_lab_talk"))
+            else if(extras.containsKey("INTENT_ENCOUNTER_LABTALK"))
             {
                 setLayoutLabTalk();
                 // extract the extra-data in the Notification
@@ -111,7 +111,7 @@ public class FeedbackActivity extends AppCompatActivity {
                 //txtView = (TextView) findViewById(R.id.txtMessage);
                 //txtView.setText(msg);
             }
-            else if(extras.containsKey("encounter_meeting"))
+            else if(extras.containsKey("INTENT_ENCOUNTER_MEETING"))
             {
                 setLayoutMeeting();
                 // extract the extra-data in the Notification

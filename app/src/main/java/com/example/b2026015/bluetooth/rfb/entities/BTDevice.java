@@ -13,9 +13,6 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.Random;
 
-/**
- * Created by B2026015 on 7/24/2016.
- */
 public class BTDevice implements Parcelable {
 
     private Integer icon;
@@ -122,11 +119,15 @@ public class BTDevice implements Parcelable {
         return Double.parseDouble(sFormat);
     }
 
-
     // Set newly calculated distance as a result of RSSI values, notifies List Adapter that values have changed
     public void distanceChanged(long nRSSI) {
-        setDistance(BLEDevice.computeAccuracy(nRSSI, power));
-        DeviceActivity.notifyDataChange();
+        double cDistance = BLEDevice.computeAccuracy(nRSSI, power);
+        if(cDistance > 0) {
+            setDistance(cDistance);
+        }
+        if(DeviceActivity.hasStarted()) {
+            DeviceActivity.notifyDataChange();
+        }
     }
 
     public String getProximityBand(double pDistance) {

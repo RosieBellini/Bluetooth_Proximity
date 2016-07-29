@@ -30,8 +30,7 @@ import android.os.Build;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.b2026015.bluetooth.R;
-import com.example.b2026015.bluetooth.rfb.activities.DeviceActivity;
+import com.example.b2026015.bluetooth.rfb.services.BLEScanningService;
 import com.example.b2026015.bluetooth.rfb.storage.Logger;
 import com.neovisionaries.bluetooth.ble.advertising.ADPayloadParser;
 import com.neovisionaries.bluetooth.ble.advertising.ADStructure;
@@ -259,8 +258,7 @@ public class BLEDevice {
         //double distance = calculateDistance(result.getRssi(), power);
 
             mLogger.writeAsync(System.currentTimeMillis() + "," + device.getAddress() + "," + rssi + "," + device.getName() + ",,," + power + ",");
-            DeviceActivity.addNewEntity(System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
-            DeviceActivity.notifyDataChange();
+            BLEScanningService.addNewEntity(System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
         }
 
 
@@ -279,8 +277,8 @@ public class BLEDevice {
 
                 // Write data to log, test and add device to beacon list if appropriate
                 mLogger.writeAsync(System.currentTimeMillis() + "," + device.getAddress() + "," + rssi + "," + device.getName() + ",,," + power + ",");//doesn't have a major, minor or uuid.
-                double distance = calculateDistance(rssi, power);
-                DeviceActivity.addNewEntity(System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
+                double distance = computeAccuracy(rssi, power);
+                BLEScanningService.addNewEntity(System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
 
 
             } else if (structure instanceof EddystoneURL) {
@@ -291,8 +289,8 @@ public class BLEDevice {
                     int power = es.getTxPower() - 41;
 
                     mLogger.writeAsync(System.currentTimeMillis() + "," + device.getAddress() + "," + rssi + "," + device.getName() + ",,," + power + ",");//doesn't have a major, minor or uuid.
-                    double distance = calculateDistance(rssi, power);
-                    DeviceActivity.addNewEntity(System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
+                    double distance = computeAccuracy(rssi, power);
+                BLEScanningService.addNewEntity(System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
 
             } else if (structure instanceof EddystoneTLM) {
                         // Eddystone TLM
@@ -312,8 +310,8 @@ public class BLEDevice {
                         int power = iBeacon.getPower();
 
                         mLogger.writeAsync(System.currentTimeMillis() + "," + device.getAddress() + "," + rssi + "," + device.getName() + "," + major + "," + minor + "," + power + "," + uuid);
-                        double distance = calculateDistance(rssi, power);
-                        DeviceActivity.addNewEntity(System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
+                        double distance = computeAccuracy(rssi, power);
+                        BLEScanningService.addNewEntity(System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
             }
         }
     }

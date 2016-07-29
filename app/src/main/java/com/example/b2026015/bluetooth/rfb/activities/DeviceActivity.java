@@ -26,40 +26,47 @@ import com.example.b2026015.bluetooth.R;
 import com.example.b2026015.bluetooth.rfb.entities.BTDevice;
 import com.example.b2026015.bluetooth.rfb.layout.CustomAdapter;
 import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
+import com.example.b2026015.bluetooth.rfb.services.BLEScanningService;
+import com.example.b2026015.bluetooth.rfb.services.TimerService;
 
 public class DeviceActivity extends Activity {
 
-    private ListView lv;
+    private ListView listView;
     private Context mContext;
     private static CustomAdapter ca;
+    private static boolean started;
+
+    private Bundle btdDeviceBundle;
 
     private static ArrayList<BTDevice> BTDeviceList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        started = true;
         setContentView(R.layout.activity_device);
+
+        BTDeviceList = BLEScanningService.getBTDeviceList();
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            BTDeviceList = getIntent().getParcelableArrayListExtra("key");
+        }
 
         // Turn on bluetooth if not on already
         turnOnBluetooth();
 
-        // Generate BLEDevice to conduct scan
-        Timestamp mTimeStamp = new Timestamp(System.currentTimeMillis());
-        long mTimeStampLong = mTimeStamp.getTime();
-        final BLEDevice mBLEDevice = new BLEDevice(getApplicationContext(), mTimeStampLong);
-
-        // Start scanning for new beacons
-        mBLEDevice.start();
+        // Start 'scanning' animation
         startAnim();
 
         // Receive context and listview for use for adapter
         mContext = this;
-        lv= (ListView) findViewById(R.id.listView);
+        listView = (ListView) findViewById(R.id.listView);
 
         // Assign custom adapter to fill list with devices + random images
         Integer[] deviceI = BTDevice.getDeviceImages();
         ca = new CustomAdapter(this, BTDeviceList, deviceI);
-        lv.setAdapter(ca);
+        listView.setAdapter(ca);
 
         // Proximity Calculator
         final ProximityComparator pc = new ProximityComparator();
@@ -76,6 +83,15 @@ public class DeviceActivity extends Activity {
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
         executor.scheduleAtFixedRate(proximityRunnable, 0, 1, TimeUnit.SECONDS);
 
+        //Runnable dedicated to continuously check proximity in order to reorder devices according to proximity
+        Runnable updateRunnable = new Runnable() {
+            public void run() {
+                ca.notifyDataSetChanged();
+            }
+        };
+
+        executor.scheduleAtFixedRate(updateRunnable, 0, 1, TimeUnit.SECONDS);
+
         Runnable detectBTRunnable = new Runnable() {
             public void run() {
                 if (!BLEDevice.isScanning()) {
@@ -89,6 +105,17 @@ public class DeviceActivity extends Activity {
         // Schedule check every 2 seconds
         executor.scheduleAtFixedRate(detectBTRunnable, 0, 2, TimeUnit.SECONDS);
 
+
+        // Wait for 10 seconds for devices to find their bearings
+        new java.util.Timer().schedule(
+                new java.util.TimerTask() {
+                    @Override
+                    public void run() {
+                        checkCloseProximity();
+                    }
+                },
+                10000
+        );
     }
 
     @Override
@@ -102,21 +129,8 @@ public class DeviceActivity extends Activity {
         ca.notifyDataSetChanged();
     }
 
-    public static boolean addNewEntity(long pTimeStamp, String pName, String pMACAddress, long pRSSI, double pPower, double pDistance ) {
-
-        BTDevice mBTDevice = new BTDevice(pTimeStamp, pName, pMACAddress, pRSSI, pPower, pDistance);
-
-        for (BTDevice BTDevice : BTDeviceList) {
-            if (mBTDevice.getMACAddress().contentEquals(BTDevice.getMACAddress())) {
-                //beacon exists already so add rssi value to it
-                BTDevice.addRSSIReading(pRSSI);
-
-                return false; //duplicate
-            }
-        }
-        BTDeviceList.add(mBTDevice);
-        ca.notifyDataSetChanged();
-        return true;
+    public static boolean hasStarted() {
+        return started;
     }
 
     public static ArrayList<BTDevice> getBTDeviceList() {
@@ -138,6 +152,16 @@ public class DeviceActivity extends Activity {
         findViewById(R.id.avloadingIndicatorView).setVisibility(View.GONE);
     }
 
+    public void checkCloseProximity() {
+        if (BTDeviceList.get(0) != null) { // If at least one device has been found
+            for (BTDevice btd : BTDeviceList) {
+                if (btd.getProxBand().equals("Immediate")) {
+                    TimerService.addCloseProxDevice(btd, System.currentTimeMillis());
+                }
+            }
+        }
+    }
+
     /*
     On resume of activity, refresh the list
      */
@@ -147,11 +171,6 @@ public class DeviceActivity extends Activity {
         super.onResume();
         ca.notifyDataSetChanged();
     }
-
-
-
-
-
 
     // Comparator class for organising bluetooth low energy devices by proximity values
     public class ProximityComparator implements Comparator<BTDevice> {

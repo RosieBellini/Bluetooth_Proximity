@@ -20,13 +20,14 @@ import com.example.b2026015.bluetooth.rfb.entities.BTDevice;
 import com.example.b2026015.bluetooth.rfb.entities.Prompt;
 import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
 
+import java.security.Timestamp;
 import java.util.ArrayList;
 
 public class TimerService extends Service {
 
-    private NotificationManager mNM;
-    private int mData;
-    private ArrayList<BTDevice> closeProxBTDevices;
+    private String encounterType;
+    private static ArrayList<BTDevice> closeProxBTDevices;
+    private final IBinder mBinder = new LocalBinder();
 
     // Unique Identification Number for the Notification.
     // We use it on Notification start, and to cancel it.
@@ -42,27 +43,56 @@ public class TimerService extends Service {
 
     @Override
     public void onCreate() {
-        mNM = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-        // Display a notification about us starting.  We put an icon in the status bar.
+
+        closeProxBTDevices = new ArrayList<>();
 
         // The PendingIntent to launch our activity if the user selects this notification
         Intent mIntent = new Intent(TimerService.this, FeedbackActivity.class);
-        mIntent.putExtra("INTENT_KEY", "Casual Encounter");
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 101, mIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-        // Create a new prompt
+        // Type of encounter (Choice of casual encounter / lab talk / meeting)
+        encounterType = "meeting";
+
+        switch (encounterType) {
+            case "casual":
+                mIntent.putExtra("INTENT_ENCOUNTER_CASUAL", "encounter_casual");
+                break;
+            case "labtalk":
+                mIntent.putExtra("INTENT_ENCOUNTER_LABTALK", "encounter_casual");
+                break;
+            case "meeting":
+                mIntent.putExtra("INTENT_ENCOUNTER_MEETING", "encounter_casual");
+                break;
+        }
+
+        // Create and send a new prompt
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 101, mIntent, PendingIntent.FLAG_CANCEL_CURRENT);
         Prompt prompt = new Prompt(personName, pendingIntent, this);
         prompt.sendNotification();
-
-        // showNotification("John", pendingIntent);
     }
 
-    public void addCloseProxDevice(BTDevice btd) {
-        closeProxBTDevices.add(btd);
+    public static void addCloseProxDevice(BTDevice sBtd, long timeStamp) {
+        for (BTDevice btd : closeProxBTDevices) { //If doesn't already exist
+        if(!sBtd.getMACAddress().contentEquals(btd.getMACAddress())) {
+                closeProxBTDevices.add(getSize(), btd);
+            }
+        }
+    }
+
+    public static int getSize() {
+        return closeProxBTDevices.size();
     }
 
     public void sendNotification(BTDevice bld) {
 
+    }
+
+    public static void printImmediate() {
+        for (BTDevice btds : closeProxBTDevices) {
+            System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXX");
+            System.out.println(btds.getMACAddress());
+            System.out.println(btds.getProxBand());
+            System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXX");
+        }
     }
 
     @Override
@@ -72,19 +102,13 @@ public class TimerService extends Service {
     }
 
     @Override
-    public void onDestroy() {
-        // Cancel the persistent notification.
-        mNM.cancel(NOTIFICATION);
-    }
-
-    @Override
     public IBinder onBind(Intent intent) {
         return mBinder;
     }
 
     // This is the object that receives interactions from clients.  See
     // RemoteService for a more complete example.
-    private final IBinder mBinder = new LocalBinder();
+
 
     /**
      * Show a notification while this service is running.
