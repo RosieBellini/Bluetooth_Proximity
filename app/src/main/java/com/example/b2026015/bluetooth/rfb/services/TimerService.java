@@ -26,6 +26,7 @@ import java.security.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Timer;
@@ -42,9 +43,10 @@ public class TimerService extends Service {
 
 
     // Arraylist for close proximity devices
-    private static HashMap<BTDevice, InteractionTimer> closeProxBTDevices;
+    private static HashMap<String, BTDevice> closeProxBTDevices;
     private final IBinder mBinder = new LocalBinder();
     private static Context mContext;
+    private static int count = 0;
 
     // Unique Identification Number for the Notification.
     // We use it on Notification start, and to cancel it.
@@ -72,29 +74,33 @@ public class TimerService extends Service {
         mContext = this.getApplicationContext();
 
         Timer timer = new Timer();
-        timer.schedule(new CheckProximity(), 0, 5000);
+        timer.schedule(new CheckProximity(), 0, 10000); //Check whether you need to remove any
     }
 
     // Adds device if in close proximity to application
     public static void addCloseProxDevice(BTDevice sBtd, long timeStamp) {
-        if (closeProxBTDevices.get(sBtd) == null) {
-            if (!sBtd.getMACAddress().contentEquals(sBtd.getMACAddress())) {
-                InteractionTimer it = new InteractionTimer(timeStamp);
-                closeProxBTDevices.put(sBtd, it);
-            }
-        }
+        InteractionTimer it = new InteractionTimer(timeStamp);
+        sBtd.setIt(it);
+        closeProxBTDevices.put(sBtd.getMACAddress(), sBtd);
     }
 
     // Removes device if no longer in immediate zone + checks timer
     public void removeCloseProxDevice() {
-        if(BLEScanningService.isAlive() &&  !BLEScanningService.getBTDeviceList().isEmpty()) {
-            for (Map.Entry<BTDevice, InteractionTimer> entry : closeProxBTDevices.entrySet()) {
-                if (entry.getKey().getProxBand().equals("Far") && entry.getValue().getInteractionLength() > 180000) // 3 minutes - interaction happened?
+        if (BLEScanningService.isAlive()) {
+            System.out.println("GOT UP TO HERE: 1 START");
+            for (Map.Entry<String, BTDevice> entry : closeProxBTDevices.entrySet()) {
+                System.out.println("GOT UP TO HERE: 2 FOR");
+                if (entry.getValue().getDistance() > 2.0) // 3 minutes - interaction happened?
                 {
-                    sendNotification(entry);
-                    closeProxBTDevices.remove(entry);
-                } else {
-                    closeProxBTDevices.remove(entry);
+                    System.out.println(entry.getValue().getMACAddress() + " " + entry.getValue().getDistance());
+                    System.out.println("GOT UP TO HERE: 3 DISTANCE > 2.0");
+                    entry.getValue().getIt().endTimer(System.currentTimeMillis());
+                    System.out.println(entry.getValue().getIt().getInteractionLength());
+                    if (entry.getValue().getIt().getInteractionLength() >= 180000) { // > 3 minutes
+                        System.out.println("GOT UP TO HERE: 4 NOTIFICATION");
+                        sendNotification(entry.getValue());
+                        closeProxBTDevices.remove(entry);
+                    }
                 }
             }
         }
@@ -104,7 +110,7 @@ public class TimerService extends Service {
         return closeProxBTDevices.size();
     }
 
-    public void sendNotification(Map.Entry<BTDevice, InteractionTimer> btIT) {
+    public void sendNotification(BTDevice b) {
 
         // The PendingIntent to launch our activity if the user selects this notification
         Intent mIntent = new Intent(mContext, FeedbackActivity.class);
@@ -126,7 +132,7 @@ public class TimerService extends Service {
 
         // Create and send a new prompt
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 101, mIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-        Prompt prompt = new Prompt(btIT.getKey().getName(), pendingIntent, this);
+        Prompt prompt = new Prompt(b.getName(), pendingIntent, this);
         prompt.sendNotification();
 
     }

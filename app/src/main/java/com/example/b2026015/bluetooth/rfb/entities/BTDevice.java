@@ -8,9 +8,6 @@ import com.example.b2026015.bluetooth.R;
 import com.example.b2026015.bluetooth.rfb.activities.DeviceActivity;
 import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.Random;
 
 public class BTDevice implements Parcelable {
@@ -28,9 +25,9 @@ public class BTDevice implements Parcelable {
     private String proxBand;
     private int mData;
 
-    private double immediate = 2.0;
-    private double near = 5.0;
-    private double far = 15.0;
+    private double immediate;
+    private double near;
+    private double far;
 
     // Interaction Timer for devices within immediate range
     private InteractionTimer it;
@@ -130,7 +127,7 @@ public class BTDevice implements Parcelable {
     public void distanceChanged(long nRSSI) {
         double cDistance = BLEDevice.computeAccuracy(nRSSI, power);
         if(cDistance > 0) {
-            setDistance(cDistance);
+            setDistance(cDistance); // format distance before changing
         }
         if(DeviceActivity.hasStarted()) {
             DeviceActivity.notifyDataChange();
@@ -138,21 +135,18 @@ public class BTDevice implements Parcelable {
     }
 
     public String getProximityBand(double pDistance) {
-        if (pDistance <= immediate) {
-            String im = "Immediate";
-            return im;
+
+        if (pDistance <= 2.0) {
+            return "Immediate";
         }
-        else if (immediate < pDistance && pDistance <= near) {
-            String ne = "Near";
-            return ne;
+        else if (2.0 < pDistance && pDistance <= 4.0) {
+            return "Near";
         }
-        else if (near < pDistance && pDistance < far) {
-            String fa = "Far";
-            return fa;
+        else if (4.0 < pDistance && pDistance <= 15.0) {
+            return "Far";
         }
 
-        String unknown = "Unknown";
-        return unknown;
+        return "???";
     }
 
     public void changeProximityBands(double pImmediate, double pNear, double pFar) {

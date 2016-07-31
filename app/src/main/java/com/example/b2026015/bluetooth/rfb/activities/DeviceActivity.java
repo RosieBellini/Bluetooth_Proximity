@@ -41,16 +41,6 @@ public class DeviceActivity extends Activity {
     private static ArrayList<BTDevice> BTDeviceList = new ArrayList<>();
     private static Timer timer;
 
-    // Class dedicated to organising proximity in listview
-    class OrganiseProximity extends TimerTask {
-        final ProximityComparator pc = new ProximityComparator();
-        public void run() {
-            // Proximity Calculator
-            Collections.sort(BTDeviceList, pc);
-            ca.notifyDataSetChanged();
-        }
-    }
-
     // Class dedicated to checking bt status
     class CheckBT extends TimerTask {
         public void run() {
@@ -59,13 +49,6 @@ public class DeviceActivity extends Activity {
                 stopAnim();
             } else
                 startAnim();
-        }
-    }
-
-    // Class dedicated to updating list
-    class UpdateList extends TimerTask {
-        public void run() {
-            ca.notifyDataSetChanged();
         }
     }
 
@@ -92,10 +75,23 @@ public class DeviceActivity extends Activity {
         ca = new CustomAdapter(this, BTDeviceList, deviceI);
         listView.setAdapter(ca);
 
+        final ProximityComparator pc = new ProximityComparator();
+
+        //Runnable dedicated to continuously check proximity in order to reorder devices according to proximity
+        Runnable checkerRunnable = new Runnable() {
+            public void run() {
+                // Proximity Calculator
+                Collections.sort(BTDeviceList, pc);
+                ca.notifyDataSetChanged();
+         }
+         };
+
+        // Schedule reordering every second
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+        executor.scheduleAtFixedRate(checkerRunnable, 0, 1, TimeUnit.SECONDS);
+
         timer = new Timer();
-        timer.schedule(new OrganiseProximity(), 0, 1000); // Every second
         timer.schedule(new CheckBT(), 0, 5000); // Every 5 seconds
-        timer.schedule(new UpdateList(), 0, 10000); // Every 10 seconds
     }
 
     @Override

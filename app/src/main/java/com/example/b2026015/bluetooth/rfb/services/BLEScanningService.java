@@ -77,10 +77,9 @@ public class BLEScanningService extends Service {
     // Checks close proximity
     public void checkCloseProximity() {
         if(TimerService.isAlive() &&  !BTDeviceList.isEmpty()) { // If activity has started + device list isn't empty
-            for (BTDevice btd : BLEScanningService.getBTDeviceList()) {
-                if (btd.getProxBand().equals("Immediate")) {
+            for (BTDevice btd : BTDeviceList) {
+                if (btd.getDistance() <= 2.0) {
                     TimerService.addCloseProxDevice(btd, System.currentTimeMillis());
-                    System.out.println(btd.getName() + " " + btd.getProxBand());
                 }
             }
         }

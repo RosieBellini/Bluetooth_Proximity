@@ -248,8 +248,7 @@ public class BLEDevice {
 //        double rounded = Math.round(accurateDist);
 //        return rounded;
         Double d = Math.pow(10d, (txPower - rssi) / (10 * 2));
-        int i = d.intValue();
-        return i;
+        return d;
 
         //Math.pow(10d, ((double) txPower - rssi) / (10 * 2));
     }
@@ -281,6 +280,7 @@ public class BLEDevice {
 
                 // Write data to log, test and add device to beacon list if appropriate
                 mLogger.writeAsync(System.currentTimeMillis() + "," + device.getAddress() + "," + rssi + "," + device.getName() + ",,," + power + ",");//doesn't have a major, minor or uuid.
+                //double distance = calculateDistance(rssi, power);
                 double distance = computeAccuracy(rssi, power);
                 BLEScanningService.addNewEntity(System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
 
@@ -294,7 +294,8 @@ public class BLEDevice {
 
                     mLogger.writeAsync(System.currentTimeMillis() + "," + device.getAddress() + "," + rssi + "," + device.getName() + ",,," + power + ",");//doesn't have a major, minor or uuid.
                     double distance = computeAccuracy(rssi, power);
-                BLEScanningService.addNewEntity(System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
+                    //double distance = calculateDistance(rssi, power);
+                    BLEScanningService.addNewEntity(System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
 
             } else if (structure instanceof EddystoneTLM) {
                         // Eddystone TLM
@@ -315,6 +316,7 @@ public class BLEDevice {
 
                         mLogger.writeAsync(System.currentTimeMillis() + "," + device.getAddress() + "," + rssi + "," + device.getName() + "," + major + "," + minor + "," + power + "," + uuid);
                         double distance = computeAccuracy(rssi, power);
+                        //double distance = calculateDistance(rssi, power);
                         BLEScanningService.addNewEntity(System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
             }
         }

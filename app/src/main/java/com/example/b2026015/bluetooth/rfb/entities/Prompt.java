@@ -37,7 +37,7 @@ public class Prompt {
                 .setTicker(status_bar_text)  // the status text
                 .setWhen(System.currentTimeMillis())  // the time stamp
                 .setContentTitle("Close2Blu")  // the label of the entry
-                .setContentText(interaction + "person" + question)  // the contents of the entry
+                .setContentText(interaction + person + question)  // the contents of the entry
                 .setContentIntent(contentIntent)  // The intent to send when the entry is clicked
                 .setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 })
                 .setLights(Color.MAGENTA, 3000, 3000)

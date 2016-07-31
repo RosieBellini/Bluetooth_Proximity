@@ -23,11 +23,10 @@ public class DBHandler extends SQLiteOpenHelper {
 
     // Results Table Columns names
     private static final String KEY_ID = "id";
-    private static final String KEY_THEME = "theme";
-    private static final String KEY_FP_NAME = "name"; // Key first person (owner)
-    private static final String KEY_FP_MAC_ADDR = "mac_address"; // MAC address of first person (owner)
-    private static final String KEY_SP_NAME = "name"; // Key second person (person questions are themed about)
-    private static final String KEY_SP_MAC_ADDR = "name"; // Key first person (owner)
+    private static final String FP_NAME = "name"; // Key first person (owner)
+    private static final String FP_MAC_ADDR = "mac_address"; // MAC address of first person (owner)
+    private static final String SP_NAME = "name"; // Key second person (person questions are themed about)
+    private static final String SP_MAC_ADDR = "name"; // Key first person (owner)
     private static final String RESPONSES = "responses";
     private static final String LENGTH_OF_INTERACTION = "length_of_interaction";
 
@@ -95,8 +94,8 @@ public class DBHandler extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String CREATE_RESULTS_TABLE = "CREATE TABLE" + TABLE_RESULTS + "("
-                + KEY_ID + " INTEGER PRIMARY KEY," + KEY_FP_NAME + " TEXT," + KEY_FP_MAC_ADDR + " TEXT"
-                + KEY_SP_NAME + " TEXT" + KEY_SP_MAC_ADDR + " TEXT" + KEY_THEME + " TEXT" + RESPONSES + " TEXT"
+                + KEY_ID + " INTEGER PRIMARY KEY," + FP_NAME + " TEXT," + FP_MAC_ADDR + " TEXT"
+                + SP_NAME + " TEXT" + SP_MAC_ADDR + " TEXT" + RESPONSES + " TEXT"
                 + LENGTH_OF_INTERACTION + " INTEGER" + ")";
         db.execSQL(CREATE_RESULTS_TABLE);
     }
@@ -114,10 +113,10 @@ public class DBHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_ID, "ID HERE"); // Unique ID number
-        values.put(KEY_FP_NAME, fDevice.getName()); // Owner Device Name
-        values.put(KEY_FP_MAC_ADDR, fDevice.getMACAddress()); // Owner MAC Address Name
-        values.put(KEY_SP_NAME, sDevice.getMACAddress()); // Responsee Name
-        values.put(KEY_SP_MAC_ADDR, sDevice.getMACAddress()); // Responsee MAC Address Name
+        values.put(FP_NAME, fDevice.getName()); // Owner Device Name
+        values.put(FP_MAC_ADDR, fDevice.getMACAddress()); // Owner MAC Address Name
+        values.put(SP_NAME, sDevice.getName()); // Responsee Name
+        values.put(SP_MAC_ADDR, sDevice.getMACAddress()); // Responsee MAC Address Name
         values.put(RESPONSES, "RESPONSES TO QUESTIONS HERE"); // Question Responses
         values.put(LENGTH_OF_INTERACTION, 34); // Length of Interaction
 
@@ -130,7 +129,7 @@ public class DBHandler extends SQLiteOpenHelper {
     public Response getResponse(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_RESULTS, new String[]{KEY_ID,
-                        KEY_FP_NAME, KEY_FP_MAC_ADDR, KEY_SP_NAME, KEY_SP_MAC_ADDR, RESPONSES, LENGTH_OF_INTERACTION}, KEY_ID + "=?",
+                        FP_NAME, FP_MAC_ADDR, SP_NAME, SP_MAC_ADDR, RESPONSES, LENGTH_OF_INTERACTION}, KEY_ID + "=?",
                 new String[]{String.valueOf(id)}, null, null, null, null);
         if (cursor != null)
             cursor.moveToFirst();
@@ -179,10 +178,10 @@ public class DBHandler extends SQLiteOpenHelper {
     public int updateShop(Response response) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(KEY_FP_NAME, response.getyName());
-        values.put(KEY_FP_MAC_ADDR, response.getyMACAddress());
-        values.put(KEY_SP_NAME, response.gettName());
-        values.put(KEY_SP_MAC_ADDR, response.gettMACAddress());
+        values.put(FP_NAME, response.getyName());
+        values.put(FP_MAC_ADDR, response.getyMACAddress());
+        values.put(SP_NAME, response.gettName());
+        values.put(SP_MAC_ADDR, response.gettMACAddress());
         values.put(RESPONSES, response.getResponses());
         values.put(LENGTH_OF_INTERACTION, response.getLength());
 
