@@ -99,7 +99,7 @@ public class TimerService extends Service {
                     if (entry.getValue().getIt().getInteractionLength() >= 180000) { // > 3 minutes
                         System.out.println("GOT UP TO HERE: 4 NOTIFICATION");
                         sendNotification(entry.getValue());
-                        closeProxBTDevices.remove(entry);
+                        closeProxBTDevices.remove(entry.getKey());
                     }
                 }
             }

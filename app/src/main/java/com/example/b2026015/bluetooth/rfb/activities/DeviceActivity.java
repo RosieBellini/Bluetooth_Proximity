@@ -12,10 +12,12 @@ import java.util.concurrent.TimeUnit;
 
 
 import android.bluetooth.BluetoothAdapter;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
+import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 
 import android.view.View;
@@ -153,4 +155,5 @@ public class DeviceActivity extends Activity {
                 return 0;
         }
     }
+
 }
