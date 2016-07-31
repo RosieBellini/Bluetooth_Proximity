@@ -33,12 +33,12 @@ public class MenuActivity extends AppCompatActivity {
         assignListeners();
 
         // Set up intents for Timer and BLEScanning services to run in the background
-        Intent sServiceIntent = new Intent(this, TimerService.class);
         Intent tServiceIntent = new Intent(this, BLEScanningService.class);
+        Intent sServiceIntent = new Intent(this, TimerService.class);
 
         // Start both services
-        startService(sServiceIntent);
         startService(tServiceIntent);
+        startService(sServiceIntent);
 
         if(BluetoothAdapter.getDefaultAdapter().getState() != BluetoothAdapter.STATE_ON)
         {

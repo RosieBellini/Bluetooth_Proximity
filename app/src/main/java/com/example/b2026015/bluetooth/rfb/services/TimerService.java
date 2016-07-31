@@ -28,6 +28,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -35,11 +37,14 @@ import java.util.concurrent.TimeUnit;
 public class TimerService extends Service {
 
     // String to hold type of social interaction
-    private String encounterType;
+    private static String encounterType;
+    private static boolean isAlive;
+
 
     // Arraylist for close proximity devices
     private static HashMap<BTDevice, InteractionTimer> closeProxBTDevices;
     private final IBinder mBinder = new LocalBinder();
+    private static Context mContext;
 
     // Unique Identification Number for the Notification.
     // We use it on Notification start, and to cancel it.
@@ -53,32 +58,24 @@ public class TimerService extends Service {
         }
     }
 
-    @Override
-    public void onCreate() {
-        closeProxBTDevices = new HashMap<>();
-
-        //Runnable dedicated to continuously check proximity in order to reorder devices according to proximity
-        Runnable checkerRunnable = new Runnable() {
-            public void run() {
-                checkCloseProximity();
-            }
-        };
-
-        // Schedule reordering every second
-        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-        executor.scheduleAtFixedRate(checkerRunnable, 0, 1, TimeUnit.SECONDS);
-    }
-
-    public void checkCloseProximity() {
-        if(DeviceActivity.hasStarted() && DeviceActivity.getBTDeviceList().get(0) != null) { // If activity has started + device list isn't empty
-            for (BTDevice btd : DeviceActivity.getBTDeviceList()) {
-                if (btd.getProxBand().equals("Immediate")) {
-                    addCloseProxDevice(btd, System.currentTimeMillis());
-                }
-            }
+    // Class dedicated to checking proximity
+    class CheckProximity extends TimerTask {
+        public void run() {
+            removeCloseProxDevice();
         }
     }
 
+    @Override
+    public void onCreate() {
+        isAlive = true;
+        closeProxBTDevices = new HashMap<>();
+        mContext = this.getApplicationContext();
+
+        Timer timer = new Timer();
+        timer.schedule(new CheckProximity(), 0, 5000);
+    }
+
+    // Adds device if in close proximity to application
     public static void addCloseProxDevice(BTDevice sBtd, long timeStamp) {
         if (closeProxBTDevices.get(sBtd) == null) {
             if (!sBtd.getMACAddress().contentEquals(sBtd.getMACAddress())) {
@@ -88,25 +85,29 @@ public class TimerService extends Service {
         }
     }
 
-    public static void removeCloseProxDevice() {
-        Iterator ite = closeProxBTDevices.entrySet().iterator();
-        for (Map.Entry<BTDevice, InteractionTimer> entry : closeProxBTDevices.entrySet()) {
-            if(entry.getValue().getInteractionLength() < 180000) // 3 minutes
-            {
-                closeProxBTDevices.remove(entry);
+    // Removes device if no longer in immediate zone + checks timer
+    public void removeCloseProxDevice() {
+        if(BLEScanningService.isAlive() &&  !BLEScanningService.getBTDeviceList().isEmpty()) {
+            for (Map.Entry<BTDevice, InteractionTimer> entry : closeProxBTDevices.entrySet()) {
+                if (entry.getKey().getProxBand().equals("Far") && entry.getValue().getInteractionLength() > 180000) // 3 minutes - interaction happened?
+                {
+                    sendNotification(entry);
+                    closeProxBTDevices.remove(entry);
+                } else {
+                    closeProxBTDevices.remove(entry);
+                }
             }
         }
     }
-
 
     public static int getSize() {
         return closeProxBTDevices.size();
     }
 
-    public void sendNotification(BTDevice bld) {
+    public void sendNotification(Map.Entry<BTDevice, InteractionTimer> btIT) {
 
         // The PendingIntent to launch our activity if the user selects this notification
-        Intent mIntent = new Intent(TimerService.this, FeedbackActivity.class);
+        Intent mIntent = new Intent(mContext, FeedbackActivity.class);
 
         // Type of encounter (Choice of casual encounter / lab talk / meeting)
         encounterType = "meeting";
@@ -125,9 +126,13 @@ public class TimerService extends Service {
 
         // Create and send a new prompt
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 101, mIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-        Prompt prompt = new Prompt(personName, pendingIntent, this);
+        Prompt prompt = new Prompt(btIT.getKey().getName(), pendingIntent, this);
         prompt.sendNotification();
 
+    }
+
+    public static boolean isAlive() {
+        return isAlive;
     }
 
     @Override

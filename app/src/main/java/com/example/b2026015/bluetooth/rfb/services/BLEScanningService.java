@@ -12,17 +12,31 @@ import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
+
+// Service dedicated to adding new BLE devices to arraylist for UI, recording RSSI values
 
 public class BLEScanningService extends Service {
 
+    private static boolean isAlive;
     private final IBinder mBinder = new LocalBinder();
     private static ArrayList<BTDevice> BTDeviceList = new ArrayList<>();
 
     public BLEScanningService() {
     }
 
+    // Class dedicated to checking proximity
+    class CheckProximity extends TimerTask {
+        public void run() {
+            checkCloseProximity();
+        }
+    }
+
     @Override
     public void onCreate() {
+
+        isAlive = true;
 
         // Generate BLEDevice to conduct scan
         Timestamp mTimeStamp = new Timestamp(System.currentTimeMillis());
@@ -32,17 +46,9 @@ public class BLEScanningService extends Service {
         // Start scanning for new beacons
         mBLEDevice.start();
 
+        Timer timer = new Timer();
+        timer.schedule(new CheckProximity(), 0, 5000);
 
-        // Wait for 10 seconds for devices to find their bearings
-        new java.util.Timer().schedule(
-                new java.util.TimerTask() {
-                    @Override
-                    public void run() {
-                        checkCloseProximity();
-                    }
-                },
-                10000
-        );
     }
 
     public static boolean addNewEntity(long pTimeStamp, String pName, String pMACAddress, long pRSSI, double pPower, double pDistance ) {
@@ -68,14 +74,20 @@ public class BLEScanningService extends Service {
         return BTDeviceList;
     }
 
+    // Checks close proximity
     public void checkCloseProximity() {
-        if (BTDeviceList.get(0) != null) { // If at least one device has been found
-            for (BTDevice btd : BTDeviceList) {
+        if(TimerService.isAlive() &&  !BTDeviceList.isEmpty()) { // If activity has started + device list isn't empty
+            for (BTDevice btd : BLEScanningService.getBTDeviceList()) {
                 if (btd.getProxBand().equals("Immediate")) {
                     TimerService.addCloseProxDevice(btd, System.currentTimeMillis());
+                    System.out.println(btd.getName() + " " + btd.getProxBand());
                 }
             }
         }
+    }
+
+    public static boolean isAlive() {
+        return isAlive;
     }
 
     public class LocalBinder extends Binder {

@@ -28,13 +28,46 @@ import com.example.b2026015.bluetooth.rfb.layout.CustomAdapter;
 import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
 import com.example.b2026015.bluetooth.rfb.services.BLEScanningService;
 
+// Class responsible for demonstrating all devices within range
+
 public class DeviceActivity extends Activity {
 
     private ListView listView;
     private Context mContext;
     private static CustomAdapter ca;
     private static boolean started;
+
+    // Device list for listview
     private static ArrayList<BTDevice> BTDeviceList = new ArrayList<>();
+    private static Timer timer;
+
+    // Class dedicated to organising proximity in listview
+    class OrganiseProximity extends TimerTask {
+        final ProximityComparator pc = new ProximityComparator();
+        public void run() {
+            // Proximity Calculator
+            Collections.sort(BTDeviceList, pc);
+            ca.notifyDataSetChanged();
+        }
+    }
+
+    // Class dedicated to checking bt status
+    class CheckBT extends TimerTask {
+        public void run() {
+            if (!BLEDevice.isScanning()) {
+                Toast.makeText(mContext, "PLEASE ACTIVATE BLUETOOTH", Toast.LENGTH_SHORT).show();
+                stopAnim();
+            } else
+                startAnim();
+        }
+    }
+
+    // Class dedicated to updating list
+    class UpdateList extends TimerTask {
+        public void run() {
+            ca.notifyDataSetChanged();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,54 +92,10 @@ public class DeviceActivity extends Activity {
         ca = new CustomAdapter(this, BTDeviceList, deviceI);
         listView.setAdapter(ca);
 
-        // Proximity Calculator
-        final ProximityComparator pc = new ProximityComparator();
-
-        //Runnable dedicated to continuously check proximity in order to reorder devices according to proximity
-        Runnable proximityRunnable = new Runnable() {
-            public void run() {
-                Collections.sort(BTDeviceList, pc);
-                ca.notifyDataSetChanged();
-            }
-        };
-
-        // Schedule reordering every second
-        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-        executor.scheduleAtFixedRate(proximityRunnable, 0, 1, TimeUnit.SECONDS);
-
-        //Runnable dedicated to continuously check proximity in order to reorder devices according to proximity
-        Runnable updateRunnable = new Runnable() {
-            public void run() {
-                ca.notifyDataSetChanged();
-            }
-        };
-
-        executor.scheduleAtFixedRate(updateRunnable, 0, 1, TimeUnit.SECONDS);
-
-        Runnable detectBTRunnable = new Runnable() {
-            public void run() {
-                if (!BLEDevice.isScanning()) {
-                    Toast.makeText(mContext, "PLEASE ACTIVATE BLUETOOTH", Toast.LENGTH_SHORT).show();
-                    stopAnim();
-                } else
-                    startAnim();
-            }
-        };
-
-        // Schedule check every 2 seconds
-        executor.scheduleAtFixedRate(detectBTRunnable, 0, 2, TimeUnit.SECONDS);
-
-
-        // Wait for 10 seconds for devices to find their bearings
-//        new java.util.Timer().schedule(
-//                new java.util.TimerTask() {
-//                    @Override
-//                    public void run() {
-//                        checkCloseProximity();
-//                    }
-//                },
-//                10000
-//        );
+        timer = new Timer();
+        timer.schedule(new OrganiseProximity(), 0, 1000); // Every second
+        timer.schedule(new CheckBT(), 0, 5000); // Every 5 seconds
+        timer.schedule(new UpdateList(), 0, 10000); // Every 10 seconds
     }
 
     @Override

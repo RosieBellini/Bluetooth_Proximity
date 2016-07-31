@@ -12,6 +12,7 @@ import android.widget.RelativeLayout;
 import com.example.b2026015.bluetooth.R;
 import com.example.b2026015.bluetooth.rfb.storage.DBHandler;
 
+
 public class FeedbackActivity extends AppCompatActivity {
 
     DBHandler dbh;
