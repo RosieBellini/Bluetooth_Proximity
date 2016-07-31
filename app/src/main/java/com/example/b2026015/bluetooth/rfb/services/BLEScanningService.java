@@ -39,7 +39,6 @@ public class BLEScanningService extends Service {
                     @Override
                     public void run() {
                         checkCloseProximity();
-                        TimerService.printImmediate();
                     }
                 },
                 10000

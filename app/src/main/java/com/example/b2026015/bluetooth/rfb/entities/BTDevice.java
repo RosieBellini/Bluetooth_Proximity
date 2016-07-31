@@ -32,6 +32,9 @@ public class BTDevice implements Parcelable {
     private double near = 5.0;
     private double far = 15.0;
 
+    // Interaction Timer for devices within immediate range
+    private InteractionTimer it;
+
     private static Integer[] deviceImages = {R.drawable.deviceb, R.drawable.deviceg, R.drawable.devicep};
 
     public BTDevice(long pTimeStamp, String pName, String pMACAddress, long pRSSI, double pPower, double pDistance ) {
@@ -106,17 +109,21 @@ public class BTDevice implements Parcelable {
         return counter;
     }
 
-    // Set distance
+    // Set distance + format for UI
     public void setDistance(double pDistance) {
         proxBand = getProximityBand(pDistance);
+
+        if(pDistance >= 10.0) {
+            String sDistance = String.valueOf(pDistance);
+            distance = Double.parseDouble(sDistance.substring(0, Math.min(sDistance.length(), 4)));
+        }
+
+        else if(pDistance < 0.0) {
+            distance = 0.0;
+        }
+
         String sDistance = String.valueOf(pDistance);
         distance = Double.parseDouble(sDistance.substring(0, Math.min(sDistance.length(), 3)));
-    }
-
-    public static double round(double value) {
-        DecimalFormat df = new DecimalFormat("#.#");
-        String sFormat = df.format(value);
-        return Double.parseDouble(sFormat);
     }
 
     // Set newly calculated distance as a result of RSSI values, notifies List Adapter that values have changed
@@ -182,6 +189,14 @@ public class BTDevice implements Parcelable {
         return proxBand;
     }
 
+    public InteractionTimer getIt() {
+        return it;
+    }
+
+    public void setIt(InteractionTimer it) {
+        this.it = it;
+    }
+
     public BTDevice(Parcel in) {
         readFromParcel(in);
     }
@@ -222,5 +237,6 @@ public class BTDevice implements Parcelable {
         proxBand = dest.readString();
 
     }
+
 }
 

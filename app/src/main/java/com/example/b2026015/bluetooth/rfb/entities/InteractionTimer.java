@@ -12,23 +12,24 @@ public class InteractionTimer {
     private long startedAt;
     private long finishedAt;
     private long interactionLength;
-    private DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    private DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss"); //29/07/2016 15:59:48
 
     public InteractionTimer(long commence) {
-        dateStart = new Date();
+        dateStart = new Date().toString();
         startedAt = commence;
-
     }
 
-    public long endTimer(long finish) {
-
+    public void endTimer(long finish) {
+        dateFinish = new Date().toString();
         finishedAt = finish - startedAt;
-        return finishedAt;
     }
 
     public String getDate() {
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date date = new Date();
-        return dateFormat.format(date); //29/07/2016 15:59:48
+        return dateFormat.format(date);
+    }
+
+    public long getInteractionLength() {
+        return finishedAt - startedAt;
     }
 }

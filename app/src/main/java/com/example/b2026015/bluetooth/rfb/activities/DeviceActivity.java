@@ -27,7 +27,6 @@ import com.example.b2026015.bluetooth.rfb.entities.BTDevice;
 import com.example.b2026015.bluetooth.rfb.layout.CustomAdapter;
 import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
 import com.example.b2026015.bluetooth.rfb.services.BLEScanningService;
-import com.example.b2026015.bluetooth.rfb.services.TimerService;
 
 public class DeviceActivity extends Activity {
 
@@ -99,15 +98,15 @@ public class DeviceActivity extends Activity {
 
 
         // Wait for 10 seconds for devices to find their bearings
-        new java.util.Timer().schedule(
-                new java.util.TimerTask() {
-                    @Override
-                    public void run() {
-                        checkCloseProximity();
-                    }
-                },
-                10000
-        );
+//        new java.util.Timer().schedule(
+//                new java.util.TimerTask() {
+//                    @Override
+//                    public void run() {
+//                        checkCloseProximity();
+//                    }
+//                },
+//                10000
+//        );
     }
 
     @Override
@@ -144,19 +143,7 @@ public class DeviceActivity extends Activity {
         findViewById(R.id.avloadingIndicatorView).setVisibility(View.GONE);
     }
 
-    public void checkCloseProximity() {
-        if (BTDeviceList.get(0) != null) { // If at least one device has been found
-            for (BTDevice btd : BTDeviceList) {
-                if (btd.getProxBand().equals("Immediate")) {
-                    TimerService.addCloseProxDevice(btd, System.currentTimeMillis());
-                }
-            }
-        }
-    }
-
-    /*
-    On resume of activity, refresh the list
-     */
+    // On resume of activity, refresh the list
     @Override
     public void onResume()
     {

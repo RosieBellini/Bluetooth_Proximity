@@ -15,20 +15,30 @@ import android.os.Parcel;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import com.example.b2026015.bluetooth.R;
+import com.example.b2026015.bluetooth.rfb.activities.DeviceActivity;
 import com.example.b2026015.bluetooth.rfb.activities.FeedbackActivity;
 import com.example.b2026015.bluetooth.rfb.entities.BTDevice;
+import com.example.b2026015.bluetooth.rfb.entities.InteractionTimer;
 import com.example.b2026015.bluetooth.rfb.entities.Prompt;
 import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
 
 import java.security.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class TimerService extends Service {
 
     // String to hold type of social interaction
     private String encounterType;
+
     // Arraylist for close proximity devices
-    private static ArrayList<BTDevice> closeProxBTDevices;
+    private static HashMap<BTDevice, InteractionTimer> closeProxBTDevices;
     private final IBinder mBinder = new LocalBinder();
 
     // Unique Identification Number for the Notification.
@@ -45,8 +55,55 @@ public class TimerService extends Service {
 
     @Override
     public void onCreate() {
+        closeProxBTDevices = new HashMap<>();
 
-        closeProxBTDevices = new ArrayList<>();
+        //Runnable dedicated to continuously check proximity in order to reorder devices according to proximity
+        Runnable checkerRunnable = new Runnable() {
+            public void run() {
+                checkCloseProximity();
+            }
+        };
+
+        // Schedule reordering every second
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+        executor.scheduleAtFixedRate(checkerRunnable, 0, 1, TimeUnit.SECONDS);
+    }
+
+    public void checkCloseProximity() {
+        if(DeviceActivity.hasStarted() && DeviceActivity.getBTDeviceList().get(0) != null) { // If activity has started + device list isn't empty
+            for (BTDevice btd : DeviceActivity.getBTDeviceList()) {
+                if (btd.getProxBand().equals("Immediate")) {
+                    addCloseProxDevice(btd, System.currentTimeMillis());
+                }
+            }
+        }
+    }
+
+    public static void addCloseProxDevice(BTDevice sBtd, long timeStamp) {
+        if (closeProxBTDevices.get(sBtd) == null) {
+            if (!sBtd.getMACAddress().contentEquals(sBtd.getMACAddress())) {
+                InteractionTimer it = new InteractionTimer(timeStamp);
+                closeProxBTDevices.put(sBtd, it);
+            }
+        }
+    }
+
+    public static void removeCloseProxDevice() {
+        Iterator ite = closeProxBTDevices.entrySet().iterator();
+        for (Map.Entry<BTDevice, InteractionTimer> entry : closeProxBTDevices.entrySet()) {
+            if(entry.getValue().getInteractionLength() < 180000) // 3 minutes
+            {
+                closeProxBTDevices.remove(entry);
+            }
+        }
+    }
+
+
+    public static int getSize() {
+        return closeProxBTDevices.size();
+    }
+
+    public void sendNotification(BTDevice bld) {
 
         // The PendingIntent to launch our activity if the user selects this notification
         Intent mIntent = new Intent(TimerService.this, FeedbackActivity.class);
@@ -70,31 +127,7 @@ public class TimerService extends Service {
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 101, mIntent, PendingIntent.FLAG_CANCEL_CURRENT);
         Prompt prompt = new Prompt(personName, pendingIntent, this);
         prompt.sendNotification();
-    }
 
-    public static void addCloseProxDevice(BTDevice sBtd, long timeStamp) {
-        for (BTDevice btd : closeProxBTDevices) { //If doesn't already exist
-        if(!sBtd.getMACAddress().contentEquals(btd.getMACAddress())) {
-                closeProxBTDevices.add(getSize(), btd);
-            }
-        }
-    }
-
-    public static int getSize() {
-        return closeProxBTDevices.size();
-    }
-
-    public void sendNotification(BTDevice bld) {
-
-    }
-
-    public static void printImmediate() {
-        for (BTDevice btds : closeProxBTDevices) {
-            System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXX");
-            System.out.println(btds.getMACAddress());
-            System.out.println(btds.getProxBand());
-            System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXX");
-        }
     }
 
     @Override
@@ -108,47 +141,5 @@ public class TimerService extends Service {
         return mBinder;
     }
 
-    // This is the object that receives interactions from clients.  See
-    // RemoteService for a more complete example.
-
-
-    /**
-     * Show a notification while this service is running.
-     */
-//    private void showNotification(String person, PendingIntent contentIntent, TimerService serivce) {
-//
-//        String interaction = "Have you just had an interaction with ";
-//        String question = "?";
-//
-//        CharSequence status_bar_text =
-//
-//        // Set the info for the views that show in the notification panel.
-//        Notification notification = new NotificationCompat.Builder(this)
-//                .setSmallIcon(R.drawable.qm)  // the status icon
-//                .setTicker(status_bar_text)  // the status text
-//                .setWhen(System.currentTimeMillis())  // the time stamp
-//                .setContentTitle("Close2Blu")  // the label of the entry
-//                .setContentText(interaction + person + question)  // the contents of the entry
-//                .setContentIntent(contentIntent)  // The intent to send when the entry is clicked
-//                .setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 })
-//                .setLights(Color.MAGENTA, 3000, 3000)
-//                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-//                .build();
-//
-//
-//        Intent notificationIntent = new Intent(this, FeedbackActivity.class);
-//        notificationIntent.putExtra("encounter_casual", "001");
-//        notificationIntent.putExtra("selected_person", "NAME OF PERSON"); // !!!!!!!!!!!!!!!!!!!!!!!!!!!
-//        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//        PendingIntent pendingNotificationIntent = PendingIntent.getActivity(getApplicationContext(),0,notificationIntent,PendingIntent.FLAG_UPDATE_CURRENT);
-//        notification.flags |= Notification.FLAG_AUTO_CANCEL;
-//        //notification.setLatestEventInfo(getApplicationContext(), "encounter_lab_talk","001", pendingNotificationIntent);
-//
-//
-//        // Send the notification.
-//        mNM.notify(NOTIFICATION, notification);
-//
-//
-//    }
 
 }

@@ -133,7 +133,7 @@ public class BLEDevice {
 
                             // Parse scan record into advertising structure format to determine type
                             List<ADStructure> structures = ADPayloadParser.getInstance().parse(scanRecord);
-                            for (ADStructure structure : structures) { // Check to see if device is a beacon
+                            for (ADStructure structure : structures) { // Check to see if device is a beacon as need to compare advertising structure
                                 if (structure instanceof EddystoneUID || structure instanceof EddystoneURL || structure instanceof EddystoneTLM || structure instanceof IBeacon) {
                                     addBLEDevice(device, result.getRssi(), scanRecord);
                                 } else {
