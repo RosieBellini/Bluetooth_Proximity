@@ -6,19 +6,20 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.example.b2026015.bluetooth.rfb.entities.Response;
 import com.example.b2026015.bluetooth.rfb.model.BTDevice;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class DBHandler extends SQLiteOpenHelper {
+public class DBResponses extends SQLiteOpenHelper {
 
     // Database Version, needs to be +1 if updated
     private static final int DATABASE_VERSION = 1;
     // Database Name
     private static final String DATABASE_NAME = "Results Store";
     // Results table name
-    private static final String TABLE_RESULTS = "Results";
+    private static final String TABLE_RESPONSES = "Responses";
 
     // Results Table Columns names
     private static final String KEY_ID = "id";
@@ -29,85 +30,29 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String RESPONSES = "responses";
     private static final String LENGTH_OF_INTERACTION = "length_of_interaction";
 
-
-    // Object for responses from database, for use on 'HistoryActivity'
-    public class Response {
-
-        private String id = "";
-        private String yName = "";
-        private String yMACAddress = "";
-        private String tName = "";
-        private String tMACAddress = "";
-        private String responses = "";
-        private int length = 0;
-
-        public Response(String pId, String pName, String pYMACAddress, String pTName, String pTMACAddress, String pResponses, int pLength) {
-
-            // Responses identification number (for lookup + updates) owner's name, mac + address and respondee's name, mac + address
-
-            id = pId;
-            yName = pName;
-            yMACAddress = pYMACAddress;
-            tName = pName;
-            tMACAddress = pTMACAddress;
-            responses = pResponses;
-            length = pLength;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public String getyName() {
-            return yName;
-        }
-
-        public String getyMACAddress() {
-            return yMACAddress;
-        }
-
-        public String gettName() {
-            return tName;
-        }
-
-        public String gettMACAddress() {
-            return tMACAddress;
-        }
-
-        public String getResponses() {
-            return responses;
-        }
-
-        public int getLength() {
-            return length;
-        }
-
-    }
-
-
-    public DBHandler(Context context) {
+    public DBResponses(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     // Assign types to columns; names and addresses of both people, social interaction 'theme', responses and length of encounter
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String CREATE_RESULTS_TABLE = "CREATE TABLE" + TABLE_RESULTS + "("
+        String CREATE_RESPONSES_TABLE = "CREATE TABLE" + TABLE_RESPONSES + "("
                 + KEY_ID + " INTEGER PRIMARY KEY," + FP_NAME + " TEXT," + FP_MAC_ADDR + " TEXT"
                 + SP_NAME + " TEXT" + SP_MAC_ADDR + " TEXT" + RESPONSES + " TEXT"
                 + LENGTH_OF_INTERACTION + " INTEGER" + ")";
-        db.execSQL(CREATE_RESULTS_TABLE);
+        db.execSQL(CREATE_RESPONSES_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Drop older table if existed
-        db.execSQL("DROP TABLE IF EXISTS" + TABLE_RESULTS);
+        db.execSQL("DROP TABLE IF EXISTS" + TABLE_RESPONSES);
         // Creating tables again
         onCreate(db);
     }
 
-    // Adding new shop
+    // Adding new response
     public void addResponse(BTDevice fDevice, BTDevice sDevice) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -120,14 +65,14 @@ public class DBHandler extends SQLiteOpenHelper {
         values.put(LENGTH_OF_INTERACTION, 34); // Length of Interaction
 
         // Insert a new row (new social interaction)
-        db.insert(TABLE_RESULTS, null, values);
+        db.insert(TABLE_RESPONSES, null, values);
         db.close(); // Closing database connection
     }
 
     // Getting one response back
     public Response getResponse(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_RESULTS, new String[]{KEY_ID,
+        Cursor cursor = db.query(TABLE_RESPONSES, new String[]{KEY_ID,
                         FP_NAME, FP_MAC_ADDR, SP_NAME, SP_MAC_ADDR, RESPONSES, LENGTH_OF_INTERACTION}, KEY_ID + "=?",
                 new String[]{String.valueOf(id)}, null, null, null, null);
         if (cursor != null)
@@ -139,12 +84,12 @@ public class DBHandler extends SQLiteOpenHelper {
         return foundResponse;
     }
 
-    // Getting All Shops
+    // Getting All Responses
     public List<Response> getAllResponses() {
         List<Response> responseList = new ArrayList<>();
 
         // Select All Query
-        String selectQuery = "SELECT * FROM " + TABLE_RESULTS;
+        String selectQuery = "SELECT * FROM " + TABLE_RESPONSES;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
 
@@ -164,7 +109,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
     // Getting shops Count
     public int getShopsCount() {
-        String countQuery = "SELECT * FROM " + TABLE_RESULTS;
+        String countQuery = "SELECT * FROM " + TABLE_RESPONSES;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(countQuery, null);
         cursor.close();
@@ -185,14 +130,14 @@ public class DBHandler extends SQLiteOpenHelper {
         values.put(LENGTH_OF_INTERACTION, response.getLength());
 
         // updating row
-        return db.update(TABLE_RESULTS, values, KEY_ID + " = ?",
+        return db.update(TABLE_RESPONSES, values, KEY_ID + " = ?",
                 new String[]{String.valueOf(response.getId())});
     }
 
     // Deleting a response
     public void deleteResponse(Response response) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_RESULTS, KEY_ID + " = ?", new String[]{String.valueOf(response.getId())});
+        db.delete(TABLE_RESPONSES, KEY_ID + " = ?", new String[]{String.valueOf(response.getId())});
         db.close();
     }
 }

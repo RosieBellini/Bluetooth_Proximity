@@ -5,11 +5,9 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
-
 import com.example.b2026015.bluetooth.rfb.activities.DeviceActivity;
 import com.example.b2026015.bluetooth.rfb.model.BTDevice;
 import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
-
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Timer;
@@ -45,8 +43,7 @@ public class BLEScanningService extends Service {
         long mTimeStampLong = mTimeStamp.getTime();
         mBLEDevice = new BLEDevice(getApplicationContext(), mTimeStampLong);
 
-        // Starts scanning for BLE devices
-        startBLEScanner();
+        mBLEDevice.start();
 
         // New timer object to check proximity
         Timer timer = new Timer();
@@ -73,8 +70,7 @@ public class BLEScanningService extends Service {
             if (mBTDevice.getMACAddress().contentEquals(btd.getMACAddress())) {
                 //beacon exists already so add rssi value to it
                 btd.addRSSIReading(pRSSI);
-
-                return false; //duplicate
+                return false;
             }
         }
         BTDeviceList.add(mBTDevice);

@@ -10,12 +10,12 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 
 import com.example.b2026015.bluetooth.R;
-import com.example.b2026015.bluetooth.rfb.storage.DBHandler;
+import com.example.b2026015.bluetooth.rfb.storage.DBResponses;
 
 
 public class FeedbackActivity extends AppCompatActivity {
 
-    DBHandler dbh;
+    DBResponses dbh;
     private Button ceButton, ltButton, mButton;
     private View.OnClickListener ceHandler, ltHandler, mHandler;
 
@@ -24,7 +24,7 @@ public class FeedbackActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feedback);
         onNewIntent(getIntent());
-        DBHandler dbh = new DBHandler(this);
+        DBResponses dbh = new DBResponses(this);
     }
 
     public void setLayoutCasual() {
@@ -39,7 +39,7 @@ public class FeedbackActivity extends AppCompatActivity {
 
                 // Insert new response
                 Log.d("Insert: ", "Inserting ..");
-                //dbh.addResponse(new DBHandler.Response(“Dockers”, ” 475 Brannan St #330, San Francisco, CA 94107, United States”));
+                //dbh.addResponse(new DBResponses.Response(“Dockers”, ” 475 Brannan St #330, San Francisco, CA 94107, United States”));
 
                 finish();
 
@@ -60,7 +60,7 @@ public class FeedbackActivity extends AppCompatActivity {
 
                 // Insert new response
                 Log.d("Insert: ", "Inserting ..");
-                //dbh.addResponse(new DBHandler.Response(“Dockers”, ” 475 Brannan St #330, San Francisco, CA 94107, United States”));
+                //dbh.addResponse(new DBResponses.Response(“Dockers”, ” 475 Brannan St #330, San Francisco, CA 94107, United States”));
 
                 finish();
 
@@ -82,7 +82,7 @@ public class FeedbackActivity extends AppCompatActivity {
 
                 // Insert new response
                 Log.d("Insert: ", "Inserting ..");
-                //dbh.addResponse(new DBHandler.Response(“Dockers”, ” 475 Brannan St #330, San Francisco, CA 94107, United States”));
+                //dbh.addResponse(new DBResponses.Response(“Dockers”, ” 475 Brannan St #330, San Francisco, CA 94107, United States”));
 
                 finish();
 

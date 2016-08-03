@@ -5,28 +5,25 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 
 import com.example.b2026015.bluetooth.R;
-import com.example.b2026015.bluetooth.rfb.storage.DBHandler;
-
-import java.util.List;
+import com.example.b2026015.bluetooth.rfb.storage.DBResponses;
 
 public class HistoryActivity extends AppCompatActivity {
 
-    DBHandler dbh;
+    DBResponses dbh;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
 
-        dbh = new DBHandler(this);
+        dbh = new DBResponses(this);
 
-        // Reading all responses provided by this person
-        Log.d("Reading: ", "Reading all shops..");
-        List<DBHandler.Response> responses = dbh.getAllResponses();
+//        // Reading all responses provided by this person
+//        Log.d("Reading: ", "Reading all shops..");
+//        List<Response> responses = dbh.getAllResponses();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

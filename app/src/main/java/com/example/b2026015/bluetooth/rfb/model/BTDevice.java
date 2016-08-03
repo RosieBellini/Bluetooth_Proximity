@@ -140,12 +140,7 @@ public class BTDevice implements Parcelable {
     // Set distance + format for UI
     public void setDistance(double pDistance) {
 
-        System.out.println("MAC ADDRESS:" + this.getMACAddress());
-        System.out.println("RAW DISTANCE (DOUBLE):" + pDistance);
         proxBand = BLEDevice.proximityFromAccuracy(pDistance);
-
-        System.out.println("PROX BAND:" + proxBand);
-
 
         // Distance less than 0 (error!) 0.0 represents NaN
         if(pDistance < 0.0 || Double.isNaN(pDistance)) {
@@ -167,11 +162,9 @@ public class BTDevice implements Parcelable {
 
         // Everything else
         else {
-            distanceString = " " + distance + "m";
             String sDistance = String.valueOf(pDistance);
             distance = Double.parseDouble(sDistance.substring(0, Math.min(sDistance.length(), 4)));
-            System.out.println("FINAL DISTANCE" + distance);
-            System.out.println("FINAL DISTANCE STRING" + distanceString);
+            distanceString = " " + distance + "m";
         }
     }
 

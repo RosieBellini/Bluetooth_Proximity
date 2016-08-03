@@ -56,8 +56,9 @@ public class TimerService extends Service {
         closeProxBTDevices = new HashMap<>();
         mContext = this.getApplicationContext();
 
+        // Check every 5 seconds whether you need to remove any close proximity devices
         Timer timer = new Timer();
-        timer.schedule(new CheckProximity(), 0, 10000); //Check whether you need to remove any
+        timer.schedule(new CheckProximity(), 0, 5000);
     }
 
     // Adds device if in close proximity to application
@@ -78,11 +79,11 @@ public class TimerService extends Service {
                     System.out.println(entry.getValue().getMACAddress() + " " + entry.getValue().getDistance());
                     System.out.println("GOT UP TO HERE: 3 DISTANCE > 2.0");
                     entry.getValue().getIt().endTimer(System.currentTimeMillis());
-                    System.out.println(entry.getValue().getIt().getInteractionLength());
-                    if (entry.getValue().getIt().getInteractionLength() >= 180000) { // > 3 minutes
-                        System.out.println("GOT UP TO HERE: 4 NOTIFICATION");
+                    System.out.println("GOT UP TO HERE: 4 INTERACTION" + entry.getValue().getIt().getInteractionLength());
+                    if (entry.getValue().getIt().getInteractionLength() >= 60000) { // > 1 minutes
+                        System.out.println("GOT UP TO HERE: 5 NOTIFICATION");
                         sendNotification(entry.getValue());
-                        closeProxBTDevices.remove(entry);
+                        closeProxBTDevices.remove(entry.getKey());
                     }
                 }
             }
@@ -99,7 +100,7 @@ public class TimerService extends Service {
         Intent mIntent = new Intent(mContext, FeedbackActivity.class);
 
         // Type of encounter (Choice of casual encounter / lab talk / meeting)
-        encounterType = "meeting";
+        encounterType = "casual";
 
         switch (encounterType) {
             case "casual":
