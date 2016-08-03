@@ -7,7 +7,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.example.b2026015.bluetooth.rfb.activities.DeviceActivity;
-import com.example.b2026015.bluetooth.rfb.entities.BTDevice;
+import com.example.b2026015.bluetooth.rfb.model.BTDevice;
 import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
 
 import java.sql.Timestamp;
@@ -22,6 +22,8 @@ public class BLEScanningService extends Service {
     private static boolean isAlive;
     private final IBinder mBinder = new LocalBinder();
     private static ArrayList<BTDevice> BTDeviceList = new ArrayList<>();
+    private static BLEDevice mBLEDevice;
+
 
     public BLEScanningService() {
     }
@@ -41,14 +43,26 @@ public class BLEScanningService extends Service {
         // Generate BLEDevice to conduct scan
         Timestamp mTimeStamp = new Timestamp(System.currentTimeMillis());
         long mTimeStampLong = mTimeStamp.getTime();
-        final BLEDevice mBLEDevice = new BLEDevice(getApplicationContext(), mTimeStampLong);
+        mBLEDevice = new BLEDevice(getApplicationContext(), mTimeStampLong);
+
+        // Starts scanning for BLE devices
+        startBLEScanner();
+
+        // New timer object to check proximity
+        Timer timer = new Timer();
+        timer.schedule(new CheckProximity(), 0, 5000);
+    }
+
+    public static void startBLEScanner() {
 
         // Start scanning for new beacons
         mBLEDevice.start();
+    }
 
-        Timer timer = new Timer();
-        timer.schedule(new CheckProximity(), 0, 5000);
+    public static void stopBLEScanner() {
 
+        // Stop scanning for new beacons
+        mBLEDevice.stop();
     }
 
     public static boolean addNewEntity(long pTimeStamp, String pName, String pMACAddress, long pRSSI, double pPower, double pDistance ) {
@@ -76,9 +90,12 @@ public class BLEScanningService extends Service {
 
     // Checks close proximity
     public void checkCloseProximity() {
-        if(TimerService.isAlive() &&  !BTDeviceList.isEmpty()) { // If activity has started + device list isn't empty
+        // If activity has started + device list isn't empty
+        if(TimerService.isAlive() &&  !BTDeviceList.isEmpty()) {
+
+            // For each device found, check whether in 'immediate' zone
             for (BTDevice btd : BTDeviceList) {
-                if (btd.getDistance() <= 2.0) {
+                if (btd.getProxBand() == "Immediate") {
                     TimerService.addCloseProxDevice(btd, System.currentTimeMillis());
                 }
             }
@@ -104,5 +121,11 @@ public class BLEScanningService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i("BLEScanningService", "Received start id " + startId + ": " + intent);
         return START_NOT_STICKY;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mBLEDevice.stop();
     }
 }

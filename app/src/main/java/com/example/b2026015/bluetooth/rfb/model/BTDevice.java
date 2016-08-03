@@ -1,4 +1,4 @@
-package com.example.b2026015.bluetooth.rfb.entities;
+package com.example.b2026015.bluetooth.rfb.model;
 
 
 import android.os.Parcel;
@@ -6,6 +6,7 @@ import android.os.Parcelable;
 
 import com.example.b2026015.bluetooth.R;
 import com.example.b2026015.bluetooth.rfb.activities.DeviceActivity;
+import com.example.b2026015.bluetooth.rfb.entities.InteractionTimer;
 import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
 
 import java.util.Random;
@@ -22,28 +23,38 @@ public class BTDevice implements Parcelable {
     private double rssi;
     private double power;
     private double distance;
+    private String distanceString;
     private String proxBand;
     private int mData;
+    private int unnamedDeviceCount;
 
     private double immediate;
     private double near;
     private double far;
+
+    // For Non-BLE Devices
+    private boolean paired;
 
     // Interaction Timer for devices within immediate range
     private InteractionTimer it;
 
     private static Integer[] deviceImages = {R.drawable.deviceb, R.drawable.deviceg, R.drawable.devicep};
 
+
+    // Constructor for BLE devices
     public BTDevice(long pTimeStamp, String pName, String pMACAddress, long pRSSI, double pPower, double pDistance ) {
 
-        if(pName == null || pName.equals("")) {
-            pName = "Unnamed Device";
+        if(pName == null) {
+            unnamedDeviceCount++;
+            pName = "Device " + unnamedDeviceCount;
         }
 
+        // Name too long, cut down
         if (pName.length() > 15) {
             pName = pName.substring(0, 15);
         }
 
+        timeStamp = pTimeStamp;
         rssiCollection = new long[RSSI_ARRAY_SIZE];
         timeStamp = pTimeStamp;
         name = pName;
@@ -52,13 +63,34 @@ public class BTDevice implements Parcelable {
         power = pPower;
         setDistance(pDistance);
         icon = deviceImages[new Random().nextInt(3)];
-        proxBand = getProximityBand(distance);
+
+    }
+
+    // Second constructor for Classic Bluetooth Devices
+    public BTDevice(long pTimeStamp, String pName, String pMACAddress, boolean pPaired) {
+
+        if(pName == null) {
+            unnamedDeviceCount++;
+            pName = "Unpaired Device" ;
+        }
+
+        // Name too long, cut down
+        if (pName.length() > 15) {
+            pName = pName.substring(0, 15);
+        }
+
+        rssiCollection = new long[RSSI_ARRAY_SIZE];
+        timeStamp = pTimeStamp;
+        name = pName;
+        MACAddress = pMACAddress;
+        paired = pPaired;
+
     }
 
     // Add RSSI reading to collection
     public void addRSSIReading(long nRssi) {
 
-        if(countNonNullItems() == RSSI_ARRAY_SIZE) { // If RSSI collection is full
+        if(countNonNullItems() == RSSI_ARRAY_SIZE && nRssi < 0) { // If RSSI collection is full + RSSI value isn't over 0
 
             setModeRSSI();
             distanceChanged(mode(rssiCollection));
@@ -85,7 +117,6 @@ public class BTDevice implements Parcelable {
                 maxValue = scans[i];
             }
         }
-
         return maxValue;
     }
 
@@ -108,19 +139,40 @@ public class BTDevice implements Parcelable {
 
     // Set distance + format for UI
     public void setDistance(double pDistance) {
-        proxBand = getProximityBand(pDistance);
 
-        if(pDistance >= 10.0) {
+        System.out.println("MAC ADDRESS:" + this.getMACAddress());
+        System.out.println("RAW DISTANCE (DOUBLE):" + pDistance);
+        proxBand = BLEDevice.proximityFromAccuracy(pDistance);
+
+        System.out.println("PROX BAND:" + proxBand);
+
+
+        // Distance less than 0 (error!) 0.0 represents NaN
+        if(pDistance < 0.0 || Double.isNaN(pDistance)) {
+            distance = 0.0;
+            distanceString = " ???m";
+        }
+
+        // Less than 1 metre
+        else if(pDistance >= 0.0 && pDistance < 1.0) {
+            distanceString = "< 1.0m";
+        }
+
+        // More than 10 metres away
+        else if(pDistance >= 10.0) {
+            distanceString = "> 10.0m";
             String sDistance = String.valueOf(pDistance);
             distance = Double.parseDouble(sDistance.substring(0, Math.min(sDistance.length(), 4)));
         }
 
-        else if(pDistance < 0.0) {
-            distance = 0.0;
+        // Everything else
+        else {
+            distanceString = " " + distance + "m";
+            String sDistance = String.valueOf(pDistance);
+            distance = Double.parseDouble(sDistance.substring(0, Math.min(sDistance.length(), 4)));
+            System.out.println("FINAL DISTANCE" + distance);
+            System.out.println("FINAL DISTANCE STRING" + distanceString);
         }
-
-        String sDistance = String.valueOf(pDistance);
-        distance = Double.parseDouble(sDistance.substring(0, Math.min(sDistance.length(), 3)));
     }
 
     // Set newly calculated distance as a result of RSSI values, notifies List Adapter that values have changed
@@ -132,21 +184,6 @@ public class BTDevice implements Parcelable {
         if(DeviceActivity.hasStarted()) {
             DeviceActivity.notifyDataChange();
         }
-    }
-
-    public String getProximityBand(double pDistance) {
-
-        if (pDistance <= 2.0) {
-            return "Immediate";
-        }
-        else if (2.0 < pDistance && pDistance <= 4.0) {
-            return "Near";
-        }
-        else if (4.0 < pDistance && pDistance <= 15.0) {
-            return "Far";
-        }
-
-        return "???";
     }
 
     public void changeProximityBands(double pImmediate, double pNear, double pFar) {
@@ -191,6 +228,10 @@ public class BTDevice implements Parcelable {
         this.it = it;
     }
 
+    public String getDistanceString() {
+        return distanceString;
+    }
+
     public BTDevice(Parcel in) {
         readFromParcel(in);
     }
@@ -233,4 +274,3 @@ public class BTDevice implements Parcelable {
     }
 
 }
-

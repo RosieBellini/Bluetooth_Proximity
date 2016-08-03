@@ -6,8 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.example.b2026015.bluetooth.rfb.entities.BTDevice;
-import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
+import com.example.b2026015.bluetooth.rfb.model.BTDevice;
 
 import java.util.ArrayList;
 import java.util.List;

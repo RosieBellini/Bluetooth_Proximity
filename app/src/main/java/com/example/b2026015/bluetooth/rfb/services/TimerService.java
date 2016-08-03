@@ -1,39 +1,22 @@
 package com.example.b2026015.bluetooth.rfb.services;
 
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.media.RingtoneManager;
 import android.os.Binder;
-import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Parcel;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import com.example.b2026015.bluetooth.R;
-import com.example.b2026015.bluetooth.rfb.activities.DeviceActivity;
 import com.example.b2026015.bluetooth.rfb.activities.FeedbackActivity;
-import com.example.b2026015.bluetooth.rfb.entities.BTDevice;
+import com.example.b2026015.bluetooth.rfb.model.BTDevice;
 import com.example.b2026015.bluetooth.rfb.entities.InteractionTimer;
 import com.example.b2026015.bluetooth.rfb.entities.Prompt;
-import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
 
-import java.security.Timestamp;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class TimerService extends Service {
 

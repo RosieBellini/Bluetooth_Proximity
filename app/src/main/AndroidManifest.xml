@@ -94,6 +94,8 @@
             android:name=".rfb.services.BLEScanningService"
             android:enabled="true"
             android:exported="true" />
+
+        <activity android:name=".rfb.activities.PairingActivity"></activity>
     </application>
 
 </manifest>

@@ -33,12 +33,12 @@ public class MenuActivity extends AppCompatActivity {
         assignListeners();
 
         // Set up intents for Timer and BLEScanning services to run in the background
-        Intent tServiceIntent = new Intent(this, BLEScanningService.class);
-        Intent sServiceIntent = new Intent(this, TimerService.class);
+        Intent bServiceIntent = new Intent(this, BLEScanningService.class);
+        Intent tServiceIntent = new Intent(this, TimerService.class);
 
         // Start both services
+        startService(bServiceIntent);
         startService(tServiceIntent);
-        startService(sServiceIntent);
 
         if(BluetoothAdapter.getDefaultAdapter().getState() != BluetoothAdapter.STATE_ON)
         {
@@ -125,6 +125,15 @@ public class MenuActivity extends AppCompatActivity {
 
     public void onBackPressed() {
         // Disallow back button pressed to avoid returning to permission page
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if(BLEScanningService.isAlive()) {
+            BLEScanningService.startBLEScanner();
+        }
     }
 
 

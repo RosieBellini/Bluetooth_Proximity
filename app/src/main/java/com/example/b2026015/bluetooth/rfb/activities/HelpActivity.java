@@ -1,14 +1,15 @@
 package com.example.b2026015.bluetooth.rfb.activities;
 
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.example.b2026015.bluetooth.R;
@@ -16,10 +17,13 @@ import com.example.b2026015.bluetooth.rfb.fragments.AboutBLEFragment;
 import com.example.b2026015.bluetooth.rfb.fragments.AboutCTBFragment;
 import com.example.b2026015.bluetooth.rfb.fragments.AboutProximityFragment;
 
-public class HelpActivity extends AppCompatActivity implements AboutCTBFragment.OnFragmentInteractionListener {
+public class HelpActivity extends AppCompatActivity implements AboutBLEFragment.OnFragmentInteractionListener,
+        AboutCTBFragment.OnFragmentInteractionListener, AboutProximityFragment.OnFragmentInteractionListener {
 
     private Button bButton, pButton, cButton;
     private View.OnClickListener bHandler, pHandler, cHandler;
+    private FragmentManager fm;
+    private ScrollView sv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +32,8 @@ public class HelpActivity extends AppCompatActivity implements AboutCTBFragment.
         generateButtons();
         generateListeners();
         assignListeners();
+
+        fm = getSupportFragmentManager();
     }
 
     protected void generateButtons() {
@@ -42,7 +48,13 @@ public class HelpActivity extends AppCompatActivity implements AboutCTBFragment.
                 TextView bluetoothTF = (TextView) findViewById(R.id.aboutBluetoothTF);
                 bluetoothTF.setTextColor(Color.parseColor("#FFFFFF"));
 
-                ;
+                FragmentTransaction ft = fm.beginTransaction();
+                AboutBLEFragment fragment = new AboutBLEFragment();
+                sv = (ScrollView) findViewById(R.id.scrollViewHelp);
+                sv.setBackgroundColor(Color.WHITE);
+                ft.add(R.id.scrollViewHelp, fragment)
+                        .addToBackStack(null) // enables back key
+                        .commit();
             }
         };
         pHandler = new View.OnClickListener() {
@@ -70,6 +82,13 @@ public class HelpActivity extends AppCompatActivity implements AboutCTBFragment.
     @Override
     public void onFragmentInteraction(Uri uri){
         //you can leave it empty
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        sv = (ScrollView) findViewById(R.id.scrollViewHelp);
+        sv.setBackgroundColor(Color.TRANSPARENT);
     }
 
 }

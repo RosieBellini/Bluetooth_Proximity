@@ -23,8 +23,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.b2026015.bluetooth.R;
-import com.example.b2026015.bluetooth.rfb.entities.BTDevice;
 import com.example.b2026015.bluetooth.rfb.layout.CustomAdapter;
+import com.example.b2026015.bluetooth.rfb.model.BTDevice;
 import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
 import com.example.b2026015.bluetooth.rfb.services.BLEScanningService;
 
@@ -44,11 +44,11 @@ public class DeviceActivity extends Activity {
     // Class dedicated to checking bt status
     class CheckBT extends TimerTask {
         public void run() {
-            if (!BLEDevice.isScanning()) {
-                Toast.makeText(mContext, "PLEASE ACTIVATE BLUETOOTH", Toast.LENGTH_SHORT).show();
-                stopAnim();
-            } else
-                startAnim();
+//            if (!BLEDevice.isScanning()) {
+//                Toast.makeText(mContext, "PLEASE ACTIVATE BLUETOOTH", Toast.LENGTH_SHORT).show();
+//                stopAnim();
+//            } else
+//                startAnim();
         }
     }
 
@@ -83,8 +83,8 @@ public class DeviceActivity extends Activity {
                 // Proximity Calculator
                 Collections.sort(BTDeviceList, pc);
                 ca.notifyDataSetChanged();
-         }
-         };
+            }
+        };
 
         // Schedule reordering every second
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
@@ -153,4 +153,5 @@ public class DeviceActivity extends Activity {
                 return 0;
         }
     }
+
 }

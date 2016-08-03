@@ -12,5 +12,8 @@
     <color name="labTalk">#f9cd65</color>
     <color name="labTalkk">#f9d465</color>
     <color name="meeting">#f58787</color>
+    <color name="enableButton">#feb3b3</color>
+    <color name="scanButton">#e4ffb7</color>
+    <color name="pairedButton">#fffcc4</color>
 
 </resources>
