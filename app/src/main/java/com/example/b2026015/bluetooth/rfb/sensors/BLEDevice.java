@@ -30,8 +30,11 @@ import android.os.Build;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.b2026015.bluetooth.rfb.activities.MenuActivity;
+import com.example.b2026015.bluetooth.rfb.entities.RecentScan;
 import com.example.b2026015.bluetooth.rfb.services.BLEScanningService;
 import com.example.b2026015.bluetooth.rfb.storage.Logger;
+import com.example.b2026015.bluetooth.rfb.storage.ScansDB;
 import com.neovisionaries.bluetooth.ble.advertising.ADPayloadParser;
 import com.neovisionaries.bluetooth.ble.advertising.ADStructure;
 import com.neovisionaries.bluetooth.ble.advertising.EddystoneTLM;
@@ -45,7 +48,7 @@ import java.util.List;
 public class BLEDevice {
 
     private String TAG = "BLEDevice";
-    private String thisDeviceAddress;
+    private static String thisDeviceAddress, thisDeviceName;
 
     static String BLE = "BLE";
     private Context mContext;
@@ -84,6 +87,14 @@ public class BLEDevice {
         setupHardware(timestamp);
     }
 
+    public static String getBLEAddress() {
+        return thisDeviceAddress;
+    }
+
+    public static String getBLEName() {
+        return thisDeviceName;
+    }
+
 
     // Import BLE hardware, alert user if BLE is not supported
     private boolean setupHardware(long timestamp){
@@ -95,6 +106,7 @@ public class BLEDevice {
         bluetoothAdapter = bluetoothManager.getAdapter();
 
         thisDeviceAddress = bluetoothAdapter.getAddress();
+        thisDeviceName = bluetoothAdapter.getName();
 
         // If OS is Lollipop or below
         if (Build.VERSION.SDK_INT < 21) {
@@ -131,7 +143,10 @@ public class BLEDevice {
                             if(device.getType() == BluetoothDevice.DEVICE_TYPE_LE) // If device is a low energy device only
                              {
                                  addBLEDevice(device, result.getRssi(), scanRecord);
-                                }
+                                 ScansDB rc = ScansDB.getInstance(mContext);
+                                 rc.addScan(device, System.currentTimeMillis());
+                                 //rc.getResponse(device.getAddress());
+                             }
                             }
                         }
                     }
@@ -187,7 +202,6 @@ public class BLEDevice {
         if(mLogger != null)
             mLogger.flush();
     }
-
 
     // BTDevice scan callback
     private BluetoothAdapter.LeScanCallback leScanCallback = new BluetoothAdapter.LeScanCallback() {
@@ -335,7 +349,6 @@ public class BLEDevice {
         advertLeDevices(enable);
         advertLeDevices(enable);
     }
-
 
     private void advertLeDevices(final boolean enable){
         if(mLEAdvert != null) {

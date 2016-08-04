@@ -14,7 +14,7 @@
     <SeekBar
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/seekB"
+        android:id="@+id/startedSeek"
         android:max="1"
         android:backgroundTint="@color/casualEncounterTint"
         android:progress="0"
@@ -38,7 +38,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="NameString"
+        android:text="Them"
         android:id="@+id/nameStringR"
         android:layout_marginTop="35dp"
         android:layout_below="@+id/ltPersonTF"
@@ -77,24 +77,24 @@
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/editText2"
+        android:id="@+id/contextTF"
         android:layout_below="@+id/ltTopcTF"
-        android:layout_alignEnd="@+id/nameStringR"
-        android:layout_alignStart="@+id/meR" />
+        android:layout_alignStart="@+id/meR"
+        android:layout_alignEnd="@+id/nameStringR" />
 
     <SeekBar
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/seekBar2"
-        android:max="9"
+        android:id="@+id/cheerfulRating"
+        android:max="10"
         android:backgroundTint="@color/abc_background_cache_hint_selector_material_light"
-        android:progress="4"
+        android:progress="5"
         android:indeterminate="false"
         android:focusable="true"
         android:progressTint="@color/accent_material_light"
         android:layout_below="@+id/ltInterestTF"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignStart="@+id/textView8"
+        android:layout_alignEnd="@+id/textView8" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -102,7 +102,7 @@
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="1       2       3       4       5       6       7       8       9       10"
         android:id="@+id/textView8"
-        android:layout_below="@+id/seekBar2"
+        android:layout_below="@+id/cheerfulRating"
         android:layout_centerHorizontal="true" />
 
     <TextView
@@ -111,9 +111,9 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="How cheerful did they seem?"
         android:id="@+id/ltInterestTF"
-        android:layout_marginTop="30dp"
-        android:layout_below="@+id/editText2"
-        android:layout_centerHorizontal="true" />
+        android:layout_marginTop="59dp"
+        android:layout_below="@+id/contextTF"
+        android:layout_alignStart="@+id/contextTF" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -122,17 +122,16 @@
         android:text="What three words best describe the encounter?"
         android:id="@+id/textView9"
         android:textAlignment="center"
-        android:layout_marginTop="30dp"
-        android:layout_below="@+id/textView8"
+        android:layout_above="@+id/casualThree"
         android:layout_alignParentStart="true" />
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/editText3"
-        android:layout_below="@+id/textView9"
-        android:layout_alignEnd="@+id/editText2"
-        android:layout_alignStart="@+id/editText2" />
+        android:id="@+id/casualThree"
+        android:layout_above="@+id/ceSubmitButton"
+        android:layout_alignStart="@+id/contextTF"
+        android:layout_alignEnd="@+id/ltInterestTF" />
 
     <Button
         style="?android:attr/buttonStyleSmall"
@@ -140,7 +139,7 @@
         android:layout_height="wrap_content"
         android:text="Submit"
         android:id="@+id/ceSubmitButton"
-        android:layout_below="@+id/editText3"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

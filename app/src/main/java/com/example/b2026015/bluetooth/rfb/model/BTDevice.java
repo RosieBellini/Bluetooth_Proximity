@@ -19,7 +19,7 @@ public class BTDevice implements Parcelable {
     private String MACAddress;
     private long[] rssiCollection;
     private int index;
-    private final static int RSSI_ARRAY_SIZE = 50;
+    private final static int RSSI_ARRAY_SIZE = 60;
     private double rssi;
     private double power;
     private double distance;
@@ -27,6 +27,7 @@ public class BTDevice implements Parcelable {
     private String proxBand;
     private int mData;
     private int unnamedDeviceCount;
+    private long rssiTimeCalled;
 
     private double immediate;
     private double near;
@@ -54,6 +55,7 @@ public class BTDevice implements Parcelable {
             pName = pName.substring(0, 15);
         }
 
+        // Assign variables
         timeStamp = pTimeStamp;
         rssiCollection = new long[RSSI_ARRAY_SIZE];
         timeStamp = pTimeStamp;
@@ -90,15 +92,18 @@ public class BTDevice implements Parcelable {
     // Add RSSI reading to collection
     public void addRSSIReading(long nRssi) {
 
-        if(countNonNullItems() == RSSI_ARRAY_SIZE && nRssi < 0) { // If RSSI collection is full + RSSI value isn't over 0
+        // If RSSI collection is 5/6 full + RSSI value isn't over 0 to exclude faulty readings
+        if(countNonNullItems() > 50 && nRssi < 0) {
 
             setModeRSSI();
             distanceChanged(mode(rssiCollection));
             rssiCollection = new long[RSSI_ARRAY_SIZE]; // New empty array of long to store values
             index = 0; // Reset index to zero
+
         }
         rssiCollection[index] = nRssi;
         index++;
+        rssiTimeCalled = System.currentTimeMillis();
 
     }
 
@@ -139,6 +144,8 @@ public class BTDevice implements Parcelable {
 
     // Set distance + format for UI
     public void setDistance(double pDistance) {
+
+        System.out.println("DISTANCE:" + pDistance);
 
         proxBand = BLEDevice.proximityFromAccuracy(pDistance);
 
@@ -223,6 +230,10 @@ public class BTDevice implements Parcelable {
 
     public String getDistanceString() {
         return distanceString;
+    }
+
+    public long getRssiTimeCalled() {
+        return rssiTimeCalled;
     }
 
     public BTDevice(Parcel in) {

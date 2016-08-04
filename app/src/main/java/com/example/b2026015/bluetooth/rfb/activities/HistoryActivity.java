@@ -8,18 +8,18 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import com.example.b2026015.bluetooth.R;
-import com.example.b2026015.bluetooth.rfb.storage.DBResponses;
+import com.example.b2026015.bluetooth.rfb.storage.SQLHelper;
 
 public class HistoryActivity extends AppCompatActivity {
 
-    DBResponses dbh;
+    SQLHelper dbh;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
 
-        dbh = new DBResponses(this);
+        dbh = SQLHelper.getInstance(this);
 
 //        // Reading all responses provided by this person
 //        Log.d("Reading: ", "Reading all shops..");

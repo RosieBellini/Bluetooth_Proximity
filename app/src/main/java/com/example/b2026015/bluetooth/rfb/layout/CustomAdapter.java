@@ -15,7 +15,6 @@ import com.example.b2026015.bluetooth.rfb.model.BTDevice;
 import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 public class CustomAdapter extends BaseAdapter {
 
@@ -49,7 +48,7 @@ public class CustomAdapter extends BaseAdapter {
         // TODO Auto-generated method stub
         Holder holder = new Holder();
         View rowView;
-        rowView = inflater.inflate(R.layout.program_list, null);
+        rowView = inflater.inflate(R.layout.device_list, null);
 
         //Find views from table layout
         holder.graphic = (ImageView) rowView.findViewById(R.id.entityImageView);

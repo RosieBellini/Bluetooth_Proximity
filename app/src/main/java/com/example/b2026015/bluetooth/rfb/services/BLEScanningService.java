@@ -91,7 +91,7 @@ public class BLEScanningService extends Service {
 
             // For each device found, check whether in 'immediate' zone
             for (BTDevice btd : BTDeviceList) {
-                if (btd.getProxBand() == "Immediate") {
+                if (btd.getProxBand().equals("Immediate")) {
                     TimerService.addCloseProxDevice(btd, System.currentTimeMillis());
                 }
             }

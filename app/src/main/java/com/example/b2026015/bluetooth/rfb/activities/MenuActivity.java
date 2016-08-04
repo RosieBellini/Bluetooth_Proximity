@@ -45,6 +45,7 @@ public class MenuActivity extends AppCompatActivity {
             turnOnBluetooth();
             Toast toast = Toast.makeText(getApplicationContext(), "Please turn on Bluetooth", Toast.LENGTH_SHORT);
             toast.show();
+
         }
     }
 
@@ -124,6 +125,7 @@ public class MenuActivity extends AppCompatActivity {
     }
 
     public void onBackPressed() {
+        super.onBackPressed();
         // Disallow back button pressed to avoid returning to permission page
     }
 

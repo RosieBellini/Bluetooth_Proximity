@@ -12,7 +12,9 @@ import com.example.b2026015.bluetooth.rfb.model.BTDevice;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DBResponses extends SQLiteOpenHelper {
+// Class dedicated to access, update and creation of local database
+
+public class SQLHelper extends SQLiteOpenHelper {
 
     // Database Version, needs to be +1 if updated
     private static final int DATABASE_VERSION = 1;
@@ -20,8 +22,9 @@ public class DBResponses extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "Results Store";
     // Results table name
     private static final String TABLE_RESPONSES = "Responses";
+    private static SQLHelper sqlInstance;
 
-    // Results Table Columns names
+    // Results
     private static final String KEY_ID = "id";
     private static final String FP_NAME = "name"; // Key first person (owner)
     private static final String FP_MAC_ADDR = "mac_address"; // MAC address of first person (owner)
@@ -30,39 +33,57 @@ public class DBResponses extends SQLiteOpenHelper {
     private static final String RESPONSES = "responses";
     private static final String LENGTH_OF_INTERACTION = "length_of_interaction";
 
-    public DBResponses(Context context) {
+
+    private SQLHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    // Singleton pattern to avoid leaking data
+    public static synchronized SQLHelper getInstance(Context context) {
+        if (sqlInstance == null) {
+            sqlInstance = new SQLHelper(context.getApplicationContext());
+        }
+        return sqlInstance;
     }
 
     // Assign types to columns; names and addresses of both people, social interaction 'theme', responses and length of encounter
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String CREATE_RESPONSES_TABLE = "CREATE TABLE" + TABLE_RESPONSES + "("
-                + KEY_ID + " INTEGER PRIMARY KEY," + FP_NAME + " TEXT," + FP_MAC_ADDR + " TEXT"
-                + SP_NAME + " TEXT" + SP_MAC_ADDR + " TEXT" + RESPONSES + " TEXT"
-                + LENGTH_OF_INTERACTION + " INTEGER" + ")";
+        String CREATE_RESPONSES_TABLE = "CREATE TABLE "
+                + TABLE_RESPONSES + "("
+                + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + FP_NAME + " TEXT NOT NULL,"
+                + FP_MAC_ADDR + " TEXT NOT NULL"
+                + SP_NAME + " TEXT NOT NULL"
+                + SP_MAC_ADDR + " TEXT NOT NULL"
+                + RESPONSES + " TEXT NOT NULL"
+                + LENGTH_OF_INTERACTION + " INTEGER NOT NULL"
+                + ");";
+
         db.execSQL(CREATE_RESPONSES_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Drop older table if existed
+
+        // Drops old table
         db.execSQL("DROP TABLE IF EXISTS" + TABLE_RESPONSES);
-        // Creating tables again
+
+        // Create a new one
         onCreate(db);
     }
 
     // Adding new response
-    public void addResponse(BTDevice fDevice, BTDevice sDevice) {
+    public void addResponse(Response response) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(KEY_ID, "ID HERE"); // Unique ID number
-        values.put(FP_NAME, fDevice.getName()); // Owner Device Name
-        values.put(FP_MAC_ADDR, fDevice.getMACAddress()); // Owner MAC Address Name
-        values.put(SP_NAME, sDevice.getName()); // Responsee Name
-        values.put(SP_MAC_ADDR, sDevice.getMACAddress()); // Responsee MAC Address Name
-        values.put(RESPONSES, "RESPONSES TO QUESTIONS HERE"); // Question Responses
-        values.put(LENGTH_OF_INTERACTION, 34); // Length of Interaction
+        values.put(KEY_ID, response.getId()); // Unique ID number
+        values.put(FP_NAME, response.getyName()); // Owner Device Name
+        values.put(FP_MAC_ADDR, response.getyMACAddress()); // Owner MAC Address Name
+        values.put(SP_NAME, response.gettName()); // Responsee Name
+        values.put(SP_MAC_ADDR, response.gettMACAddress()); // Responsee MAC Address Name
+        values.put(RESPONSES, response.getResponses()); // Question Responses
+        values.put(LENGTH_OF_INTERACTION, response.getLength()); // Length of Interaction
 
         // Insert a new row (new social interaction)
         db.insert(TABLE_RESPONSES, null, values);

@@ -27,6 +27,7 @@ public class InteractionTimer {
     public void endTimer(long finish) {
         dateFinish = new Date().toString();
         finishedAt = finish;
+        interactionLength = finishedAt - startedAt;
     }
 
     public String[] getDates() {

@@ -47,9 +47,6 @@ public class ClassicAdapter extends BaseAdapter {
 
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.list_item_device, null);
-
-            holder = new ClassicHolder();
-
             holder.nameTv = (TextView) convertView.findViewById(R.id.tv_name);
             holder.addressTv = (TextView) convertView.findViewById(R.id.tv_address);
             holder.pairBtn = (Button) convertView.findViewById(R.id.btn_pair);
