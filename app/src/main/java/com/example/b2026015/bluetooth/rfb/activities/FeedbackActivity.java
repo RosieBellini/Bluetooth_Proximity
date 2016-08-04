@@ -19,6 +19,8 @@ import com.example.b2026015.bluetooth.rfb.model.BTDevice;
 import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
 import com.example.b2026015.bluetooth.rfb.storage.SQLHelper;
 
+import java.util.Date;
+
 
 public class FeedbackActivity extends AppCompatActivity {
 
@@ -36,7 +38,7 @@ public class FeedbackActivity extends AppCompatActivity {
         ba = BluetoothAdapter.getDefaultAdapter();
         setContentView(R.layout.activity_feedback);
         onNewIntent(getIntent());
-        sql = SQLHelper.getInstance(this);
+        sql = new SQLHelper(this);
         address = BLEDevice.getBLEAddress();
 
         sName = this.getIntent().getExtras().getString("second_person_name");
@@ -87,10 +89,11 @@ public class FeedbackActivity extends AppCompatActivity {
                 });
 
                 String responses = "" + seekValue + "/" + startedSB.getMax() + "\n" + contextTF.getText() + "\n" + cheerfulSB + "/" + cheerfulSB.getMax() + "\n" + threeTF.getText();
+                String date = "" + new Date();
 
                 // Insert new response
                 Log.d("Insert: ", "Inserting ..");
-                sql.addResponse(new Response("" + id, sName, sMAC, responses, interactionLength));
+                sql.addResponse(new Response("" + id, sName, sMAC, responses, date, interactionLength));
 
                 // Increase number for database
                 id++;

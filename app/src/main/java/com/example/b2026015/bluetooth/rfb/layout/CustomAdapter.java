@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.b2026015.bluetooth.R;
+import com.example.b2026015.bluetooth.rfb.entities.Response;
 import com.example.b2026015.bluetooth.rfb.model.BTDevice;
 import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
 
@@ -20,7 +21,7 @@ import java.util.List;
 public class CustomAdapter extends BaseAdapter {
 
     // Beacons & BLE devices
-    List<BTDevice> bleList;
+     List<BTDevice> bleList;
     Integer[] entityImages;
     Context context;
 

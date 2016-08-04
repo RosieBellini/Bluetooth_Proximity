@@ -45,7 +45,6 @@ public class MenuActivity extends AppCompatActivity {
             turnOnBluetooth();
             Toast toast = Toast.makeText(getApplicationContext(), "Please turn on Bluetooth", Toast.LENGTH_SHORT);
             toast.show();
-
         }
     }
 

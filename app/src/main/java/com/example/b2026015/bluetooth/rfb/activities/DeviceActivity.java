@@ -70,8 +70,6 @@ public class DeviceActivity extends Activity {
         // Receive context and listview for use for adapter
         mContext = this;
         listView = (ListView) findViewById(R.id.listView);
-
-        // Assign custom adapter to fill list with devices + random images
         Integer[] deviceI = BTDevice.getDeviceImages();
         ca = new CustomAdapter(this, BTDeviceList, deviceI);
         listView.setAdapter(ca);
