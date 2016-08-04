@@ -88,7 +88,8 @@ public class FeedbackActivity extends AppCompatActivity {
                     }
                 });
 
-                String responses = "" + seekValue + "/" + startedSB.getMax() + "\n" + contextTF.getText() + "\n" + cheerfulSB + "/" + cheerfulSB.getMax() + "\n" + threeTF.getText();
+                String responses = "responses";
+                //String responses = "" + seekValue + "/" + startedSB.getMax() + "\n" + contextTF.getText() + "\n" + cheerfulSB + "/" + cheerfulSB.getMax() + "\n" + threeTF.getText();
                 String date = "" + new Date();
 
                 // Insert new response

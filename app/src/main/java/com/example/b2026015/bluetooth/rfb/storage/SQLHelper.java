@@ -30,7 +30,7 @@ public class SQLHelper extends SQLiteOpenHelper {
     private static final String SP_NAME = "s_name"; // Key second person (person questions are themed about)
     private static final String SP_MAC_ADDR = "s_mac_address"; // Key first person (owner)
     private static final String RESPONSES = "responses";
-    private static final String DATE_OF_ENCOUNTER = "date_of_encounter";
+    private static final String DATE_OF_INTERACTION = "date_of_interaction";
     private static final String LENGTH_OF_INTERACTION = "length_of_interaction";
 
 
@@ -50,7 +50,7 @@ public class SQLHelper extends SQLiteOpenHelper {
                 + SP_NAME + " TEXT NOT NULL, "
                 + SP_MAC_ADDR + " TEXT NOT NULL, "
                 + RESPONSES + " TEXT NOT NULL, "
-                + DATE_OF_ENCOUNTER + " TEXT NOT NULL, "
+                + DATE_OF_INTERACTION + " TEXT NOT NULL, "
                 + LENGTH_OF_INTERACTION + " INTEGER NOT NULL"
                 + ");";
 
@@ -77,7 +77,7 @@ public class SQLHelper extends SQLiteOpenHelper {
         values.put(SP_NAME, response.gettName()); // Responsee Name
         values.put(SP_MAC_ADDR, response.gettMACAddress()); // Responsee MAC Address Name
         values.put(RESPONSES, response.getResponses()); // Question Responses
-        values.put(DATE_OF_ENCOUNTER, response.getDate()); // Date + time of encounter
+        values.put(DATE_OF_INTERACTION, "" + response.getDate()); // Date + time of encounter
         values.put(LENGTH_OF_INTERACTION, response.getLength()); // Length of Interaction
 
         // Insert a new row (new social interaction)
@@ -95,7 +95,7 @@ public class SQLHelper extends SQLiteOpenHelper {
                 SP_NAME,
                 SP_MAC_ADDR,
                 RESPONSES,
-                DATE_OF_ENCOUNTER,
+                DATE_OF_INTERACTION,
                 LENGTH_OF_INTERACTION
                 }, KEY_ID + "=?",
                 new String[]{String.valueOf(id)}, null, null, null, null);
@@ -174,7 +174,7 @@ public class SQLHelper extends SQLiteOpenHelper {
         values.put(SP_NAME, response.gettName());
         values.put(SP_MAC_ADDR, response.gettMACAddress());
         values.put(RESPONSES, response.getResponses());
-        values.put(DATE_OF_ENCOUNTER, response.getDate());
+        values.put(DATE_OF_INTERACTION, response.getDate());
         values.put(LENGTH_OF_INTERACTION, response.getLength());
 
         // updating row

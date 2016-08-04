@@ -40,8 +40,7 @@ public class HistoryActivity extends AppCompatActivity {
 
         // Receive context and listview for use for adapter
         mContext = this;
-        listView = (ListView) findViewById(R.id.listView);
-        Integer[] deviceI = BTDevice.getDeviceImages();
+        listView = (ListView) findViewById(R.id.listViewPE);
         ea = new EncounterAdapter(this);
         listView.setAdapter(ea);
 
