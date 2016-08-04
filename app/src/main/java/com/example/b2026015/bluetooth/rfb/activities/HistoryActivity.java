@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.b2026015.bluetooth.R;
 import com.example.b2026015.bluetooth.rfb.entities.Response;
@@ -28,6 +29,7 @@ public class HistoryActivity extends AppCompatActivity {
     private SQLHelper dbHelper;
     ArrayList<Response> responsesList;
     private ListView listView;
+    private TextView tv;
     private Context mContext;
     private static EncounterAdapter ea;
 
@@ -50,9 +52,10 @@ public class HistoryActivity extends AppCompatActivity {
         // If responses table isn't empty
         if(!dbHelper.isEmpty()) {
             responsesList = dbHelper.getAllResponses();
+            tv = (TextView) findViewById(R.id.noPastEncountersT);
         }
         else {
-            System.out.println("NO RESPONSES TO DISPLAY");
+            //tv.setVisibility(View.INVISIBLE);
         }
     }
 

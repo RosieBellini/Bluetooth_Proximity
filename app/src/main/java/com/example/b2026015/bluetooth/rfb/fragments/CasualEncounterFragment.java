@@ -106,4 +106,8 @@ public class CasualEncounterFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
+
+    public void callParentMethod(){
+        getActivity().onBackPressed();
+    }
 }

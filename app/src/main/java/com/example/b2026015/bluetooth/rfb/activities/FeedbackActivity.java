@@ -190,4 +190,8 @@ public class FeedbackActivity extends AppCompatActivity {
 
     }
 
+    public void onBackPressed() {
+        // disallow back pressed
+    }
+
 }
