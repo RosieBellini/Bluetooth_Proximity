@@ -9,6 +9,7 @@ import com.example.b2026015.bluetooth.rfb.activities.DeviceActivity;
 import com.example.b2026015.bluetooth.rfb.entities.InteractionTimer;
 import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class BTDevice implements Parcelable {
@@ -17,7 +18,7 @@ public class BTDevice implements Parcelable {
     private long timeStamp;
     private String name;
     private String MACAddress;
-    private long[] rssiCollection;
+    private ArrayList<Long> rssiCollection;
     private int index;
     private final static int RSSI_ARRAY_SIZE = 60;
     private double rssi;
@@ -57,7 +58,7 @@ public class BTDevice implements Parcelable {
 
         // Assign variables
         timeStamp = pTimeStamp;
-        rssiCollection = new long[RSSI_ARRAY_SIZE];
+        rssiCollection = new ArrayList<>();
         timeStamp = pTimeStamp;
         name = pName;
         MACAddress = pMACAddress;
@@ -81,7 +82,7 @@ public class BTDevice implements Parcelable {
             pName = pName.substring(0, 15);
         }
 
-        rssiCollection = new long[RSSI_ARRAY_SIZE];
+        rssiCollection = new ArrayList<Long>();
         timeStamp = pTimeStamp;
         name = pName;
         MACAddress = pMACAddress;
@@ -97,29 +98,29 @@ public class BTDevice implements Parcelable {
 
             setModeRSSI();
             distanceChanged(mode(rssiCollection));
-            rssiCollection = new long[RSSI_ARRAY_SIZE]; // New empty array of long to store values
+            rssiCollection = new ArrayList<>();; // New empty array of long to store values
             index = 0; // Reset index to zero
 
         }
-        rssiCollection[index] = nRssi;
+        rssiCollection.add(nRssi);
         index++;
         rssiTimeCalled = System.currentTimeMillis();
 
     }
 
     // Find mode of RSSI values collected
-    public long mode(long[] scans) {
+    public long mode(ArrayList<Long> scans) {
 
         long maxValue = 0, maxCount = 0;
 
-        for (int i = 0; i < scans.length; ++i) {
+        for (int i = 0; i < scans.size(); ++i) {
             int count = 0;
-            for (int j = 0; j < scans.length; ++j) {
-                if (scans[j] == scans[i]) ++count;
+            for (int j = 0; j < scans.size(); ++j) {
+                if (scans.get(j) == scans.get(i)) ++count;
             }
             if (count > maxCount) {
                 maxCount = count;
-                maxValue = scans[i];
+                maxValue = scans.get(i);
             }
         }
         return maxValue;
@@ -135,8 +136,8 @@ public class BTDevice implements Parcelable {
     public int countNonNullItems()
     {
         int counter = 0;
-        for (int i = 0; i < rssiCollection.length; i++) {
-            if (rssiCollection[i] != 0) // Changed from null (originally Long[])
+        for (int i = 0; i < rssiCollection.size(); i++) {
+            if (rssiCollection.get(i) != 0) // Changed from null (originally Long[])
                 counter++;
         }
         return counter;
@@ -265,7 +266,7 @@ public class BTDevice implements Parcelable {
     // Called from constructor to create this object from a parcel
     public void readFromParcel(Parcel dest) {
 
-        rssiCollection = dest.createLongArray(); // CREATE instead of read
+        //rssiCollection = dest.readSerializable(); // CREATE instead of read
         timeStamp = dest.readLong();
         name = dest.readString();
         MACAddress = dest.readString();

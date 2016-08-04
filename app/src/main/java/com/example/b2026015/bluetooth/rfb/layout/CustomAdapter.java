@@ -15,17 +15,18 @@ import com.example.b2026015.bluetooth.rfb.model.BTDevice;
 import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class CustomAdapter extends BaseAdapter {
 
     // Beacons & BLE devices
-    ArrayList<BTDevice> bleList;
+    List<BTDevice> bleList;
     Integer[] entityImages;
     Context context;
 
     private static LayoutInflater inflater = null;
 
-    public CustomAdapter (Activity activity, ArrayList<BTDevice> pEntityList, Integer[] pEntityImages) {
+    public CustomAdapter (Activity activity, List<BTDevice> pEntityList, Integer[] pEntityImages) {
 
         context = activity;
         bleList = pEntityList;

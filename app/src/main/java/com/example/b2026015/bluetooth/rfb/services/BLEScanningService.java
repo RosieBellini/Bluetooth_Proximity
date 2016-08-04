@@ -10,6 +10,8 @@ import com.example.b2026015.bluetooth.rfb.model.BTDevice;
 import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -19,9 +21,8 @@ public class BLEScanningService extends Service {
 
     private static boolean isAlive;
     private final IBinder mBinder = new LocalBinder();
-    private static ArrayList<BTDevice> BTDeviceList = new ArrayList<>();
+    private static List<BTDevice> BTDeviceList = Collections.synchronizedList(new ArrayList<BTDevice>());
     private static BLEDevice mBLEDevice;
-
 
     public BLEScanningService() {
     }
@@ -80,7 +81,7 @@ public class BLEScanningService extends Service {
         return true;
     }
 
-    public static ArrayList<BTDevice> getBTDeviceList() {
+    public static List<BTDevice> getBTDeviceList() {
         return BTDeviceList;
     }
 

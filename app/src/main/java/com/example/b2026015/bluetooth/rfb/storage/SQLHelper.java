@@ -52,11 +52,11 @@ public class SQLHelper extends SQLiteOpenHelper {
         String CREATE_RESPONSES_TABLE = "CREATE TABLE "
                 + TABLE_RESPONSES + "("
                 + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + FP_NAME + " TEXT NOT NULL,"
-                + FP_MAC_ADDR + " TEXT NOT NULL"
-                + SP_NAME + " TEXT NOT NULL"
-                + SP_MAC_ADDR + " TEXT NOT NULL"
-                + RESPONSES + " TEXT NOT NULL"
+                + FP_NAME + " TEXT NOT NULL, "
+                + FP_MAC_ADDR + " TEXT NOT NULL, "
+                + SP_NAME + " TEXT NOT NULL, "
+                + SP_MAC_ADDR + " TEXT NOT NULL, "
+                + RESPONSES + " TEXT NOT NULL, "
                 + LENGTH_OF_INTERACTION + " INTEGER NOT NULL"
                 + ");";
 

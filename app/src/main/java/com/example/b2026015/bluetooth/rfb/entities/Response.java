@@ -10,14 +10,14 @@ public class Response {
     private String id, yName, yMACAddress, tName, tMACAddress, responses;
     private long length = 0;
 
-    public Response(String pId, BTDevice secondPerson, String pResponses, long pLength) {
+    public Response(String pId, String pName, String pMAC, String pResponses, long pLength) {
 
         // Responses identification number (for lookup + updates) owner's name, mac + address and respondee's name, mac + address
         id = pId;
         yName = BLEDevice.getBLEName();
         yMACAddress = BLEDevice.getBLEAddress();
-        tName = secondPerson.getName();
-        tMACAddress = secondPerson.getMACAddress();
+        tName = pName;
+        tMACAddress = pMAC;
         responses = pResponses;
         length = pLength;
     }

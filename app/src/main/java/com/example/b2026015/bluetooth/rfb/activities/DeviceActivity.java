@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Executors;
@@ -38,7 +39,7 @@ public class DeviceActivity extends Activity {
     private static boolean started;
 
     // Device list for listview
-    private static ArrayList<BTDevice> BTDeviceList = new ArrayList<>();
+    private static List<BTDevice> BTDeviceList = new ArrayList<>();
     private static Timer timer;
 
     // Class dedicated to checking bt status
@@ -109,7 +110,7 @@ public class DeviceActivity extends Activity {
         return started;
     }
 
-    public static ArrayList<BTDevice> getBTDeviceList() {
+    public static List<BTDevice> getBTDeviceList() {
         return BTDeviceList;
     }
 

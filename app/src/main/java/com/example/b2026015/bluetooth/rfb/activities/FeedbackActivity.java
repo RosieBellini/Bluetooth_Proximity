@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.example.b2026015.bluetooth.R;
 import com.example.b2026015.bluetooth.rfb.entities.Response;
 import com.example.b2026015.bluetooth.rfb.model.BTDevice;
+import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
 import com.example.b2026015.bluetooth.rfb.storage.SQLHelper;
 
 
@@ -25,9 +26,8 @@ public class FeedbackActivity extends AppCompatActivity {
     private View.OnClickListener ceHandler, ltHandler, mHandler;
     private SQLHelper sql;
     private int seekValue, seekValueRate, id;
-    private String address;
+    private String address, sName, sMAC;
     private BluetoothAdapter ba;
-    private BTDevice secondPerson;
     private long interactionLength;
 
     @Override
@@ -37,8 +37,10 @@ public class FeedbackActivity extends AppCompatActivity {
         setContentView(R.layout.activity_feedback);
         onNewIntent(getIntent());
         sql = SQLHelper.getInstance(this);
-        address = ba.getAddress();
-        secondPerson = this.getIntent().getExtras().getParcelable("second_person");
+        address = BLEDevice.getBLEAddress();
+
+        sName = this.getIntent().getExtras().getString("second_person_name");
+        sMAC = this.getIntent().getExtras().getString("second_person_mac");
         interactionLength = this.getIntent().getExtras().getLong("length_interaction");
 
     }
@@ -58,7 +60,6 @@ public class FeedbackActivity extends AppCompatActivity {
                 final TextView threeTF = (TextView) findViewById(R.id.casualThree);
 
                 startedSB.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                    int seek = 0;
                     @Override
                     public void onStopTrackingTouch(SeekBar seekBar) {
                     }
@@ -85,11 +86,11 @@ public class FeedbackActivity extends AppCompatActivity {
                     }
                 });
 
-                String responses = "" + seekValue + "\n" + contextTF.getText() + "\n" + cheerfulSB + "\n" + threeTF.getText();
+                String responses = "" + seekValue + "/" + startedSB.getMax() + "\n" + contextTF.getText() + "\n" + cheerfulSB + "/" + cheerfulSB.getMax() + "\n" + threeTF.getText();
 
                 // Insert new response
                 Log.d("Insert: ", "Inserting ..");
-                sql.addResponse(new Response("" + id, secondPerson, responses, interactionLength));
+                sql.addResponse(new Response("" + id, sName, sMAC, responses, interactionLength));
 
                 // Increase number for database
                 id++;

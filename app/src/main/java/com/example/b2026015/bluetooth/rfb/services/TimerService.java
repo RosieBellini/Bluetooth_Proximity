@@ -112,7 +112,8 @@ public class TimerService extends Service {
 
                         Intent i = new Intent();
                         i.setClass(this, FeedbackActivity.class);
-                        i.putExtra("second_person", pair.getValue());
+                        i.putExtra("second_person_name", pair.getValue().getName());
+                        i.putExtra("second_person_mac", pair.getValue().getMACAddress());
                         i.putExtra("length_interaction", pair.getValue().getIt().getInteractionLength());
                         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
