@@ -27,16 +27,6 @@ public class MenuActivity extends AppCompatActivity {
     private Button bButton, dButton, hButton, zButton, heButton;
     private View.OnClickListener bHandler, dHandler, hHandler, zHandler, heHandler;
 
-    // Class dedicated to checking bt status
-    class CheckBT extends TimerTask {
-        public void run() {
-            if (!mBluetoothAdapter.isEnabled()) {
-                turnOnBluetooth();
-
-            }
-        }
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,10 +44,6 @@ public class MenuActivity extends AppCompatActivity {
         // Start both services
         startService(bServiceIntent);
         startService(tServiceIntent);
-
-        // Check Bluetooth is on
-        timer = new Timer();
-        timer.schedule(new CheckBT(), 0, 5000); // Every 5 seconds
 
         if (!mBluetoothAdapter.isEnabled()) {
             Toast toast = Toast.makeText(getApplicationContext(), "Please turn on Bluetooth", Toast.LENGTH_SHORT);

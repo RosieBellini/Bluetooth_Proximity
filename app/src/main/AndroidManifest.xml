@@ -28,11 +28,6 @@
         <activity
             android:name=".rfb.activities.PermissionActivity"
             android:screenOrientation="portrait">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
-
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
         </activity>
         <!-- This meta-data tag is required to use Google Play Services. -->
         <meta-data
@@ -48,9 +43,17 @@
         <activity
             android:name=".rfb.activities.ChangeZoneActivity"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".rfb.activities.MenuActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+            </activity>
+
         <activity
             android:name=".rfb.activities.BluetoothActivity"
             android:screenOrientation="portrait" />
@@ -68,11 +71,6 @@
             android:name=".rfb.activities.HelpActivity"
             android:screenOrientation="portrait" />
 
-        <service
-            android:name=".rfb.services.ScanningService"
-            android:enabled="true"
-            android:exported="true"
-            android:screenOrientation="portrait" />
         <service
             android:name=".rfb.services.TimerService"
             android:enabled="true"

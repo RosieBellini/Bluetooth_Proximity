@@ -16,13 +16,11 @@ import java.util.ArrayList;
 public class SQLHelper extends SQLiteOpenHelper {
 
     // Database Version, needs to be +1 if updated
-    public static final int DATABASE_VERSION = 2;
-    // Database Name
+    public static final int DATABASE_VERSION = 4;
     public static final String DATABASE_NAME = "Results Store";
-    // Results table name
-    public static final String TABLE_RESPONSES = "Responses";
 
-    // Device table name
+    // Table names
+    public static final String TABLE_RESPONSES = "Responses";
     public static final String TABLE_DEVICES = "Devices";
 
     // Results
@@ -33,6 +31,7 @@ public class SQLHelper extends SQLiteOpenHelper {
     private static final String SP_MAC_ADDR = "s_mac_address"; // Key first person (owner)
     private static final String RESPONSES = "responses";
     private static final String DATE_OF_INTERACTION = "date_of_interaction";
+    private static final String TIME_OF_INTERACTION = "time_of_interaction";
     private static final String LENGTH_OF_INTERACTION = "length_of_interaction";
 
     //Devices
@@ -57,6 +56,7 @@ public class SQLHelper extends SQLiteOpenHelper {
                 + SP_MAC_ADDR + " TEXT NOT NULL, "
                 + RESPONSES + " TEXT NOT NULL, "
                 + DATE_OF_INTERACTION + " TEXT NOT NULL, "
+                + TIME_OF_INTERACTION + " TEXT NOT NULL, "
                 + LENGTH_OF_INTERACTION + " INTEGER NOT NULL"
                 + "); ";
 
@@ -84,13 +84,15 @@ public class SQLHelper extends SQLiteOpenHelper {
     public void addResponse(Response response) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(KEY_ID, response.getId()); // Unique ID number
+
+        // NB: Id not required as autoincrement active
         values.put(FP_NAME, response.getyName()); // Owner Device Name
         values.put(FP_MAC_ADDR, response.getyMACAddress()); // Owner MAC Address Name
         values.put(SP_NAME, response.gettName()); // Responsee Name
         values.put(SP_MAC_ADDR, response.gettMACAddress()); // Responsee MAC Address Name
         values.put(RESPONSES, response.getResponses()); // Question Responses
         values.put(DATE_OF_INTERACTION, "" + response.getDate()); // Date + time of encounter
+        values.put(TIME_OF_INTERACTION, "" + response.getTime());
         values.put(LENGTH_OF_INTERACTION, response.getLength()); // Length of Interaction
 
         // Insert a new row (new social interaction)
@@ -113,16 +115,31 @@ public class SQLHelper extends SQLiteOpenHelper {
                 SP_MAC_ADDR,
                 RESPONSES,
                 DATE_OF_INTERACTION,
+                TIME_OF_INTERACTION,
                 LENGTH_OF_INTERACTION
                 }, KEY_ID + "=?",
                 new String[]{String.valueOf(id)}, null, null, null, null);
         if (cursor != null)
             cursor.moveToFirst();
         Response foundResponse = new Response(cursor.getString(0),
-                cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getString(4), cursor.getString(5), cursor.getString(6), Integer.parseInt(cursor.getString(7)));
+                cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getString(4), cursor.getString(5), Integer.parseInt(cursor.getString(6)));
 
         // return response
         return foundResponse;
+    }
+
+    public String findDevice(String macAddress) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_RESPONSES, new String[]{
+                KEY_MAC_ADDR,
+                DEVICE_NAME
+                }, KEY_MAC_ADDR + "=?",
+                new String[]{String.valueOf(macAddress)}, null, null, null, null);
+        if (cursor != null)
+            cursor.moveToFirst();
+        String foundAddress = macAddress;
+
+        return foundAddress;
     }
 
     // Getting All Responses
@@ -138,7 +155,7 @@ public class SQLHelper extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             do {
                 Response response = new Response(cursor.getString(0),
-                        cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getString(4), cursor.getString(5), cursor.getString(6), Integer.parseInt(cursor.getString(7)));
+                        cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getString(4), Long.parseLong(cursor.getString(6)));
 
                 // Adding response to list
                 responseList.add(response);
@@ -148,6 +165,13 @@ public class SQLHelper extends SQLiteOpenHelper {
         cursor.close();
         // return response list
         return responseList;
+    }
+
+    public void deleteAll()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("delete from "+ TABLE_RESPONSES);
+        db.close();
     }
 
     public boolean isEmpty() {
@@ -162,27 +186,6 @@ public class SQLHelper extends SQLiteOpenHelper {
         mCursor.close();
         return true;
     }
-
-//    public boolean isEmpty() {
-//
-//        SQLiteDatabase db = this.getWritableDatabase();
-//        Cursor mCursor = db.rawQuery("SELECT * FROM " + TABLE_RESPONSES, null);
-//        boolean empty;
-//
-//        if (mCursor.moveToFirst())
-//        {
-//            // DO SOMETHING WITH CURSOR
-//            empty = false;
-//            return empty;
-//
-//        } else
-//        {
-//            // I AM EMPTY
-//            empty = true;
-//            return empty;
-//        }
-//
-//    }
 
     // Getting shops Count
     public int getShopsCount() {
@@ -209,13 +212,13 @@ public class SQLHelper extends SQLiteOpenHelper {
 
         // updating row
         return db.update(TABLE_RESPONSES, values, KEY_ID + " = ?",
-                new String[]{String.valueOf(response.getId())});
+                new String[]{String.valueOf(response.gettMACAddress())});
     }
 
     // Deleting a response
     public void deleteResponse(Response response) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_RESPONSES, KEY_ID + " = ?", new String[]{String.valueOf(response.getId())});
+        db.delete(TABLE_RESPONSES, KEY_ID + " = ?", new String[]{String.valueOf(response.gettMACAddress())});
         db.close();
     }
 }

@@ -127,14 +127,19 @@ public class FeedbackActivity extends AppCompatActivity {
                 String responses = "" + seekValue + "/" + startedSB.getMax() + "\n" + contextTF.getText() + "\n" + cheerfulSB + "/" + cheerfulSB.getMax() + "\n" + threeTF.getText();
 
                 SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE dd MMM yyyy", Locale.ENGLISH);
-                String formatted = dateFormat.format(new Date());
-                String date = formatted;
+                String formattedD = dateFormat.format(new Date());
+
+                SimpleDateFormat timeFormat = new SimpleDateFormat("HH mm ss", Locale.ENGLISH);
+                String formattedT = timeFormat.format(new Date());
+
+                String date = formattedD;
+                String time = formattedT;
+
+
 
                 // Insert new response
                 Log.d("Insert: ", "Inserting ..");
-                responseId++;
-
-                sql.addResponse(new Response("" + responseId, sName, sMAC, responses, date, interactionLength));
+                sql.addResponse(new Response("" + sName, sMAC, responses, date, time, interactionLength));
 
                 finish();
 

@@ -6,31 +6,30 @@ import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
 
 public class Response {
 
-    private String id;
     private String yName;
     private String yMACAddress;
     private String tName;
     private String tMACAddress;
     private String date;
+    private String time;
     private String responses;
     private long length = 0;
 
-    public Response(String pId, String pName, String pMAC, String pResponses, String pDate, long pLength) {
+    public Response(String pName, String pMAC, String pResponses, String pDate, String pTime, long pLength) {
 
         // Responses identification number (for lookup + updates) owner's name, mac + address and respondee's name, mac + address
-        id = pId;
         yName = BLEDevice.getBLEName();
         yMACAddress = BLEDevice.getBLEAddress();
         tName = pName;
         tMACAddress = pMAC;
         responses = pResponses;
         date = pDate;
+        time = pTime;
         length = pLength;
     }
 
-    public Response(String pId, String pName, String pMACAddress, String ppName, String ppMACAddress, String pResponses, String pDate, long pLength) {
+    public Response(String pName, String pMACAddress, String ppName, String ppMACAddress, String pResponses, String pDate, long pLength) {
 
-        id = pId;
         yName = pName;
         yMACAddress = pMACAddress;
         tName = ppName;
@@ -40,9 +39,6 @@ public class Response {
         length = pLength;
     }
 
-    public String getId() {
-        return id;
-    }
 
     public String getyName() {
         return yName;
@@ -66,6 +62,10 @@ public class Response {
 
     public long getLength() {
         return length;
+    }
+
+    public String getTime() {
+        return time;
     }
 
     public String getDate() {

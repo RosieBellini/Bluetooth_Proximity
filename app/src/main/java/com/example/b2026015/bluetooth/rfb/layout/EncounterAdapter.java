@@ -18,8 +18,10 @@ import com.example.b2026015.bluetooth.rfb.model.BTDevice;
 import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
 import com.example.b2026015.bluetooth.rfb.storage.SQLHelper;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Random;
 
 public class EncounterAdapter extends BaseAdapter {
@@ -62,6 +64,7 @@ public class EncounterAdapter extends BaseAdapter {
         holder.graphic.setImageResource(questionImage[0]);
         holder.personName.setText(resp.gettName());
         holder.date.setText(resp.getDate());
+        holder.time.setText(resp.getDate());
         holder.length.setText(humanReadableMilli(resp.getLength()));
 
         rowView.setOnClickListener(new View.OnClickListener() {
@@ -93,6 +96,16 @@ public class EncounterAdapter extends BaseAdapter {
         double minutes = Math.floor((milli % 3600000) / 60000);
         double seconds = Math.floor(((milli % 360000) % 60000) / 1000);
         return "" + minutes + "m" + " " + seconds + "s";
+    }
+
+    public String formatDate(Date date) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE dd MMM yyyy", Locale.ENGLISH);
+        return dateFormat.format(date);
+    }
+
+    public String formatTime(Date date) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("HH mm ss", Locale.ENGLISH);
+        return dateFormat.format(date);
     }
 
     public void setData(ArrayList<Response> data) {
@@ -127,6 +140,7 @@ public class EncounterAdapter extends BaseAdapter {
         ImageView graphic;
         TextView personName;
         TextView date;
+        TextView time;
         TextView length;
 
     }
