@@ -123,4 +123,17 @@
         android:layout_alignBottom="@+id/aboutCLBTF"
         android:layout_alignParentStart="true" />
 
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/scrollViewHelp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/helpBleButton"
+        android:layout_alignParentStart="true"
+        android:fillViewport="false"
+        android:visibility="visible"
+        android:touchscreenBlocksFocus="false"
+        android:textAlignment="center" />
+
 </RelativeLayout>

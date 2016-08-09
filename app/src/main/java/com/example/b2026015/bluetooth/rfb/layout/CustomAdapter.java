@@ -2,10 +2,6 @@ package com.example.b2026015.bluetooth.rfb.layout;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,29 +11,29 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.b2026015.bluetooth.R;
-import com.example.b2026015.bluetooth.rfb.activities.DeviceActivity;
-import com.example.b2026015.bluetooth.rfb.entities.BTDevice;
-import com.example.b2026015.bluetooth.rfb.fragments.NeighbourFragment;
+import com.example.b2026015.bluetooth.rfb.entities.Response;
+import com.example.b2026015.bluetooth.rfb.model.BTDevice;
+import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class CustomAdapter extends BaseAdapter {
 
-    ArrayList<BTDevice> entityList;
+    // Beacons & BLE devices
+     List<BTDevice> bleList;
     Integer[] entityImages;
-    String identifier;
     Context context;
 
     private static LayoutInflater inflater = null;
 
-    public CustomAdapter(Activity activity, ArrayList<BTDevice> pEntityList, Integer[] pEntityImages) {
+    public CustomAdapter (Activity activity, List<BTDevice> pEntityList, Integer[] pEntityImages) {
 
         context = activity;
-        entityList = pEntityList;
+        bleList = pEntityList;
         entityImages = pEntityImages;
         inflater = (LayoutInflater) context.
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
     }
 
     // Holder for layout
@@ -54,7 +50,7 @@ public class CustomAdapter extends BaseAdapter {
         // TODO Auto-generated method stub
         Holder holder = new Holder();
         View rowView;
-        rowView = inflater.inflate(R.layout.program_list, null);
+        rowView = inflater.inflate(R.layout.device_list, null);
 
         //Find views from table layout
         holder.graphic = (ImageView) rowView.findViewById(R.id.entityImageView);
@@ -64,12 +60,12 @@ public class CustomAdapter extends BaseAdapter {
         holder.proximityValue = (TextView) rowView.findViewById(R.id.entityProximityTextView);
 
         // For each entry in deviceInfo Map
-        BTDevice bt = (BTDevice) entityList.get(position);
+        BTDevice bt = (BTDevice) bleList.get(position);
         holder.graphic.setImageResource(bt.getIcon());
         holder.deviceName.setText(bt.getName());
         holder.macAddress.setText(bt.getMACAddress());
-        holder.proximityZone.setText(bt.getProximityBand(bt.getDistance()));
-        holder.proximityValue.setText("" + bt.getDistance());
+        holder.proximityZone.setText(BLEDevice.proximityFromAccuracy(bt.getDistance()));
+        holder.proximityValue.setText(bt.getDistanceString());
 
 //        double distance = blee.calculateDistance();
 //        if (isBetween(distance, 0.0, 3.0)) {
@@ -86,7 +82,7 @@ public class CustomAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
-                Toast.makeText(context, "You Clicked " + entityList.get(position).getName(), Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "You Clicked " + bleList.get(position).getName(), Toast.LENGTH_LONG).show();
             }
         });
         rowView.setOnLongClickListener(new View.OnLongClickListener() {
@@ -106,7 +102,7 @@ public class CustomAdapter extends BaseAdapter {
     @Override
     public int getCount() {
         // TODO Auto-generated method stub
-        return entityList.size();
+        return bleList.size();
     }
 
     @Override
@@ -122,3 +118,4 @@ public class CustomAdapter extends BaseAdapter {
     }
 
 }
+

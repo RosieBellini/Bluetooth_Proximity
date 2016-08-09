@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#ff4081</color>
+    <color name="white">#FFFFFF</color>
+    <color name="list_intimate_proximity">#d8ccda</color>
+    <color name="list_close_proximity">#d0e2d8</color>
+    <color name="list_far_proximity">#e2debd</color>
+    <color name="casualEncounter">#e7f37b</color>
+    <color name="casualEncounterTint">#b7eb72</color>
+    <color name="labTalk">#f9cd65</color>
+    <color name="labTalkk">#f9d465</color>
+    <color name="meeting">#f58787</color>
+
+</resources>

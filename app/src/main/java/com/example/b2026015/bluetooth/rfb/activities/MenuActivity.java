@@ -12,15 +12,30 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.b2026015.bluetooth.R;
+import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
 import com.example.b2026015.bluetooth.rfb.services.BLEScanningService;
 import com.example.b2026015.bluetooth.rfb.services.TimerService;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MenuActivity extends AppCompatActivity {
 
     private boolean isEnabled;
+    private Timer timer;
     private BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     private Button bButton, dButton, hButton, zButton, heButton;
     private View.OnClickListener bHandler, dHandler, hHandler, zHandler, heHandler;
+
+    // Class dedicated to checking bt status
+    class CheckBT extends TimerTask {
+        public void run() {
+            if (!mBluetoothAdapter.isEnabled()) {
+                turnOnBluetooth();
+
+            }
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,19 +48,22 @@ public class MenuActivity extends AppCompatActivity {
         assignListeners();
 
         // Set up intents for Timer and BLEScanning services to run in the background
-        Intent tServiceIntent = new Intent(this, BLEScanningService.class);
-        Intent sServiceIntent = new Intent(this, TimerService.class);
+        Intent bServiceIntent = new Intent(this, BLEScanningService.class);
+        Intent tServiceIntent = new Intent(this, TimerService.class);
 
         // Start both services
+        startService(bServiceIntent);
         startService(tServiceIntent);
-        startService(sServiceIntent);
 
-        if(BluetoothAdapter.getDefaultAdapter().getState() != BluetoothAdapter.STATE_ON)
-        {
-            turnOnBluetooth();
+        // Check Bluetooth is on
+        timer = new Timer();
+        timer.schedule(new CheckBT(), 0, 5000); // Every 5 seconds
+
+        if (!mBluetoothAdapter.isEnabled()) {
             Toast toast = Toast.makeText(getApplicationContext(), "Please turn on Bluetooth", Toast.LENGTH_SHORT);
             toast.show();
         }
+
     }
 
     protected boolean turnOnBluetooth()
@@ -125,6 +143,16 @@ public class MenuActivity extends AppCompatActivity {
 
     public void onBackPressed() {
         // Disallow back button pressed to avoid returning to permission page
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // If service is active and scanner has been stopped
+        if(BLEScanningService.isAlive() && BLEScanningService.getState()) {
+            BLEScanningService.startBLEScanner();
+        }
     }
 
 

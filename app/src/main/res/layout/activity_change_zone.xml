@@ -54,7 +54,7 @@
         android:text="Values should be in metres"
         android:id="@+id/values"
         android:layout_alignParentBottom="true"
-        android:layout_toEndOf="@+id/farTF" />
+        android:layout_centerHorizontal="true" />
 
     <Button
         style="?android:attr/buttonStyleSmall"

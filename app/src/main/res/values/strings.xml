@@ -3,55 +3,61 @@
     // App Name
     <string name="app_name">Bluetooth</string>
 
-
     // MenuActivity Options
     <string name="menu_activity_bluetooth_option">Turn Bluetooth On/Off</string>
     <string name="menu_activity_devices_option">Nearby Devices</string>
     <string name="menu_activity_history_option">Response History</string>
-    <string name="menu_activity_zones_option">Change Proximity Zones</string>
+    <string name="menu_activity_zones_option">Change Proximity/Timeout</string>
     <string name="menu_activity_help_option">Help</string>
 
+    // Bluetooth Activity
+    <string name="bluetooth_on">"Bluetooth is On"</string>
+    <string name="bluetooth_disable">Disable</string>
+    <string name="bluetooth_off">"Bluetooth is Off"</string>
+    <string name="bluetooth_enable">Enable</string>
+    <string name="bluetooth_not_supported">Bluetooth is unsupported by this device</string>
 
     // HelpActivity Options
     <string name="help_activity_beacon_option">About BLE + Beacons</string>
     <string name="help_activity_proximity_option">About Proximity Calculation</string>
     <string name="help_activity_closetoblue_option">About CloseToBlue</string>
     <string name="ble_long_description">
-
-        <html>
-         <![CDATA[
-        <h1>About Bluetooth Low Energy. \n\n</h1>
-        <h2>Information correct as of August 2016</h2>
-        <p>Bluetooth is a wireless technology standard for exchanging data over short distances from </p>
-        <p>mobile phones, computers and other electronic devices by forming personal area networks </p>
-        <p>(PAN) between devices. Bluetooth Low Energy (BLE), marketed as ‘Bluetooth Smart’ is a new </p>
-        <p>specification of Bluetooth (Bluetooth 4.0) providing considerably reduced power consumption </p>
-        <p>and cost in transmitting data and forming networks. \n\n</p>
-        <h2>Bluetooth Low Energy Is Compatible With:</h2>
-        <ul>
-        <li>iOS5+ (iOS7+ preferred) </li>
-        <li>Android 4.3+ (numerous big fixes in 4.4+</li>
-        <li>Apple OS X 10.6+</li>
-        <li>Windows 8 (XP, Vista and 7 only support Bluetooth 2.1)</li>
-        <li>GNU/Linux Vanilla BlueZ 4.93+</li>
-        </ul>
-        ]]>
-        </html>
-
-        "About Bluetooth Low Energy.\n\n"
-
+        "About Bluetooth Low Energy.\n\n\n"
         "Bluetooth is a wireless technology standard for exchanging data over short distances from "
         "mobile phones, computers and other electronic devices by forming personal area networks "
         "(PAN) between devices. Bluetooth Low Energy (BLE), marketed as ‘Bluetooth Smart’ is a new "
         "specification of Bluetooth (Bluetooth 4.0) providing considerably reduced power consumption "
-        "and cost in transmitting data and forming networks "
-
-        "Bluetooth Low Energy is supported on the following platforms: \n"
+        "and cost in transmitting data and forming networks \n\n"
+        "Bluetooth Low Energy is supported on the following platforms: \n\n"
         "iOS5+ (iOS7+ preferred) "
         "Android 4.3+ (numerous big fixes in 4.4+ \n"
         "Apple OS X 10.6+ \n"
         "Windows 8 (XP, Vista and 7 only support Bluetooth 2,1) \n"
         "GNU/Linux Vanilla BlueZ 4.93+ \n\n"
+    </string>
+    <string name="about_proximity_calculation">
+        "About Proximity Calculation. \n\n\n"
+        "Proximity between bluetooth low energy devices is calculated by receiving advertising packets "
+        "from constantly advertising devices such as beacons. In this advertisement, helpful values "
+        "such as the transmission power (TxPower) and the Received Signal Strength Indicator (RSSI) "
+        "are extracted and used in an equation to calculate distance away from the device transmitting "
+        "the signal. \n"
+        "Additional checks have been installed to ensure more accurate readings, such as noise reduction "
+        "from the local environment and averages rather than raw values of extracted advertising variables "
+        "have been used to reduce the chance of false readings. \n"
+        "These advertising packets do not contain any sensitive data so it is safe to leave a device "
+        "advertising without concern for exposure of information."
+    </string>
+    <string name="about_close_to_blue">
+        "About Close2Blue. \n\n\n"
+        "Close2Blu is a dissertation project conducted by Rosanna Bellini as part of her dissertation "
+        "project conducted over the summer of 2016 for a degree in MSc Computer Science. \n"
+        "The project was inspired after researching the different methods for the collection of social "
+        "interactions between participants and noticing the substantial lack of consideration for the "
+        "qualitative rather than quantitative element of the interaction. Through a greater involvement "
+        "of the participant as they socially interact with others, it is possible to potentially draw up a "
+        "much richer image of that interaction and train a more accurate model to predict occurrences of "
+        "social interactions."
     </string>
 
 

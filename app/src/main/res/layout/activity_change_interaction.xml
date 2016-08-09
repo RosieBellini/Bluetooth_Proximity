@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.example.b2026015.bluetooth.rfb.activities.ChangeInteractionActivity"
+    android:background="@drawable/hourglass"
+    android:backgroundTint="#b8edde">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Change Time Out"
+        android:id="@+id/timeoutTF"
+        android:layout_marginTop="88dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/changeTimeEdit"
+        android:layout_below="@+id/timeoutTF"
+        android:layout_alignStart="@+id/timeoutTF"
+        android:layout_alignEnd="@+id/timeoutTF"
+        android:inputType="number" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Change Interaction Length"
+        android:id="@+id/changeInteractionTF"
+        android:layout_marginBottom="88dp"
+        android:layout_above="@+id/intTimesButton"
+        android:layout_centerHorizontal="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/changeInteractionEdit"
+        android:layout_marginTop="35dp"
+        android:layout_alignTop="@+id/changeInteractionTF"
+        android:layout_alignStart="@+id/changeTimeEdit"
+        android:layout_alignEnd="@+id/changeTimeEdit"
+        android:inputType="number" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Submit"
+        android:id="@+id/intTimesButton"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Values are in minutes"
+        android:id="@+id/informationTime"
+        android:layout_above="@+id/intTimesButton"
+        android:layout_alignEnd="@+id/changeInteractionEdit" />
+
+</RelativeLayout>

@@ -4,11 +4,11 @@
     android:layout_height="match_parent"
     tools:context="com.example.b2026015.bluetooth.rfb.fragments.AboutCTBFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment"
-        android:id="@+id/ctbFragment" />
+        android:text="@string/about_close_to_blue"
+        android:id="@+id/ctbFragment"
+        android:textAlignment="center"/>
 
 </FrameLayout>

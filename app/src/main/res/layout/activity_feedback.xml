@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".rfb.activities.FeedbackActivity">
+    tools:context=".rfb.activities.FeedbackActivity"
+    android:background="@color/interactionYN">
 
     <!--<fragment android:name="com.example.b2026015.bluetooth.rfb.fragments.CasualEncounterFragment"-->
         <!--android:id="@+id/ceFragment"-->
@@ -22,4 +23,44 @@
         <!--android:layout_height="match_parent" />-->
 
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView10"
+        android:src="@drawable/questionb"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Have you just had a social interaction\n with someone?"
+        android:id="@+id/textView"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="87dp"
+        android:textColor="#ffffff"
+        android:textAlignment="center" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Yes"
+        android:id="@+id/yButtonSI"
+        android:layout_marginBottom="36dp"
+        android:background="#ffffff"
+        android:layout_alignParentBottom="true"
+        android:layout_alignEnd="@+id/textView"
+        android:layout_marginEnd="28dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No"
+        android:id="@+id/nButtonSI"
+        android:background="#ffffff"
+        android:layout_alignTop="@+id/yButtonSI"
+        android:layout_alignStart="@+id/textView"
+        android:layout_marginStart="34dp" />
 </RelativeLayout>

@@ -32,10 +32,7 @@ public class Logger {
     protected String mName;
     protected String mDeviceName ="MOBILE";
     protected ArrayList<String> mData = null;
-
-
     private BroadcastReceiver mStorageReceiver = null;
-
     protected int mFlushThreshold = 1000;
     protected final int MIN_FLUSH_THRESHOLD = 50;
 
@@ -47,20 +44,18 @@ public class Logger {
     };
 
     public Logger(String name, int flushThreshold, long timestamp, FileFormat format) {
-        // initialize variables
 
+        // initialize variables
         mName = name;
         mFlushThreshold = Math.max(MIN_FLUSH_THRESHOLD, flushThreshold);
-        mData = new ArrayList<String>();
+        mData = new ArrayList<>();
         setFileInfo(timestamp,format);
         mDeviceName = BluetoothAdapter.getDefaultAdapter().getAddress();
     }
 
-
     public String getFilename(){
         return mFilename;
     }
-
 
     public void setFileInfo(long timestamp, FileFormat format){
         mFolderName = mFolderName+"/"+timestamp+"/";

@@ -6,6 +6,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+// Model that holds the length of time spent within a particular proximity
+
 public class InteractionTimer {
 
     private String dateStart;
@@ -25,6 +27,7 @@ public class InteractionTimer {
     public void endTimer(long finish) {
         dateFinish = new Date().toString();
         finishedAt = finish;
+        interactionLength = finishedAt - startedAt;
     }
 
     public String[] getDates() {

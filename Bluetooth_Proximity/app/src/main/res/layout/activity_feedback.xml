@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/feedback_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".rfb.activities.FeedbackActivity">
+
+    <!--<fragment android:name="com.example.b2026015.bluetooth.rfb.fragments.CasualEncounterFragment"-->
+        <!--android:id="@+id/ceFragment"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="match_parent" />-->
+    <!--<fragment android:name="com.example.b2026015.bluetooth.rfb.fragments.LabTalkFragment"-->
+        <!--android:id="@+id/ltFragment"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="match_parent" />-->
+    <!--<fragment android:name="com.example.b2026015.bluetooth.rfb.fragments.LabTalkFragment"-->
+        <!--android:id="@+id/mFragment"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="match_parent" />-->
+
+
+</RelativeLayout>

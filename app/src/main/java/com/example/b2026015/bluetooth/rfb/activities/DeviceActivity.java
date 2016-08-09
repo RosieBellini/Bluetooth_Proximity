@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Executors;
@@ -12,21 +13,21 @@ import java.util.concurrent.TimeUnit;
 
 
 import android.bluetooth.BluetoothAdapter;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
-import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.b2026015.bluetooth.R;
-import com.example.b2026015.bluetooth.rfb.entities.BTDevice;
 import com.example.b2026015.bluetooth.rfb.layout.CustomAdapter;
+import com.example.b2026015.bluetooth.rfb.model.BTDevice;
 import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
 import com.example.b2026015.bluetooth.rfb.services.BLEScanningService;
 
@@ -40,19 +41,33 @@ public class DeviceActivity extends Activity {
     private static boolean started;
 
     // Device list for listview
-    private static ArrayList<BTDevice> BTDeviceList = new ArrayList<>();
+    private static List<BTDevice> BTDeviceList = new ArrayList<>();
     private static Timer timer;
 
     // Class dedicated to checking bt status
     class CheckBT extends TimerTask {
         public void run() {
-            if (!BLEDevice.isScanning()) {
-                Toast.makeText(mContext, "PLEASE ACTIVATE BLUETOOTH", Toast.LENGTH_SHORT).show();
-                stopAnim();
-            } else
-                startAnim();
+//            if (!BLEDevice.isScanning()) {
+//                Toast.makeText(mContext, "PLEASE ACTIVATE BLUETOOTH", Toast.LENGTH_SHORT).show();
+//                stopAnim();
+//            } else
+//                startAnim();
         }
     }
+
+    public class CustomObserver extends DataSetObserver
+    {
+        @Override
+        public void onChanged() {
+            MotionEvent mv = MotionEvent.obtain(1, 1, MotionEvent.ACTION_DOWN, 1, 1, 0);
+            listView = (ListView) findViewById(R.id.listView);
+            listView.dispatchTouchEvent(mv);
+        }
+    }
+
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,11 +86,11 @@ public class DeviceActivity extends Activity {
         // Receive context and listview for use for adapter
         mContext = this;
         listView = (ListView) findViewById(R.id.listView);
-
-        // Assign custom adapter to fill list with devices + random images
         Integer[] deviceI = BTDevice.getDeviceImages();
         ca = new CustomAdapter(this, BTDeviceList, deviceI);
+        ca.registerDataSetObserver(new CustomObserver());
         listView.setAdapter(ca);
+
 
         final ProximityComparator pc = new ProximityComparator();
 
@@ -85,8 +100,8 @@ public class DeviceActivity extends Activity {
                 // Proximity Calculator
                 Collections.sort(BTDeviceList, pc);
                 ca.notifyDataSetChanged();
-         }
-         };
+            }
+        };
 
         // Schedule reordering every second
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
@@ -111,7 +126,7 @@ public class DeviceActivity extends Activity {
         return started;
     }
 
-    public static ArrayList<BTDevice> getBTDeviceList() {
+    public static List<BTDevice> getBTDeviceList() {
         return BTDeviceList;
     }
 

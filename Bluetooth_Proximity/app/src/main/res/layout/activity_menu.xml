@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.example.b2026015.bluetooth.rfb.activities.MenuActivity"
+    android:background="@drawable/background">
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/menuBluetoothButton"
+        android:layout_alignParentEnd="true"
+        android:height="80dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:backgroundTint="#0000"
+        android:clickable="true"
+        android:backgroundTintMode="src_in"
+        android:foreground="#0000"
+        android:foregroundTint="#0000"
+        android:textColor="#0000"
+        android:textColorHighlight="#0000"
+        android:textColorHint="#0000"
+        android:textColorLink="#0000"
+        android:visibility="visible"
+        style="?android:attr/borderlessButtonStyle" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/menuDevicesButton"
+        android:height="100dp"
+        android:layout_above="@+id/menuHistoryButton"
+        android:layout_alignParentStart="true"
+        android:layout_alignEnd="@+id/menuHistoryButton"
+        android:backgroundTint="#0000"
+        android:clickable="true"
+        android:backgroundTintMode="src_in"
+        android:foreground="#0000"
+        android:foregroundTint="#0000"
+        android:textColor="#0000"
+        android:textColorHighlight="#0000"
+        android:textColorHint="#0000"
+        android:textColorLink="#0000"
+        android:visibility="visible"
+        style="?android:attr/borderlessButtonStyle" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/menuHistoryButton"
+        android:layout_centerVertical="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:height="100dp"
+        android:backgroundTint="#0000"
+        android:clickable="true"
+        android:backgroundTintMode="src_in"
+        android:foreground="#0000"
+        android:foregroundTint="#0000"
+        android:textColor="#0000"
+        android:textColorHighlight="#0000"
+        android:textColorHint="#0000"
+        android:textColorLink="#0000"
+        android:visibility="visible"
+        style="?android:attr/borderlessButtonStyle" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/menuZonesButton"
+        android:height="100dp"
+        android:layout_below="@+id/menuHistoryButton"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:clickable="true"
+        android:backgroundTint="#0000"
+        android:backgroundTintMode="src_in"
+        android:foreground="#0000"
+        android:foregroundTint="#0000"
+        android:textColor="#0000"
+        android:textColorHighlight="#0000"
+        android:textColorHint="#0000"
+        android:textColorLink="#0000"
+        android:visibility="visible"
+        style="?android:attr/borderlessButtonStyle"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/menuHelpButton"
+        android:height="100dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignEnd="@+id/menuZonesButton"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/menuZonesButton"
+        android:clickable="true"
+        android:backgroundTint="#0000"
+        android:backgroundTintMode="src_in"
+        android:foreground="#0000"
+        android:foregroundTint="#0000"
+        android:textColor="#0000"
+        android:textColorHighlight="#0000"
+        android:textColorHint="#0000"
+        android:textColorLink="#0000"
+        android:visibility="visible"
+        style="?android:attr/borderlessButtonStyle" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/menu_activity_bluetooth_option"
+        android:id="@+id/menuBluetoothTF"
+        android:layout_marginTop="23dp"
+        android:layout_alignTop="@+id/menuBluetoothButton"
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/menu_activity_devices_option"
+        android:id="@+id/menuProximityTF"
+        android:layout_alignTop="@+id/menuDevicesButton"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="28dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/menu_activity_history_option"
+        android:id="@+id/menuHistoryTF"
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/menu_activity_zones_option"
+        android:id="@+id/menuZonesTF"
+        android:layout_above="@+id/menuHelpButton"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="34dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/menu_activity_help_option"
+        android:id="@+id/menuHelpTF"
+        android:layout_marginBottom="23dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView3"
+        android:src="@drawable/bluetooth"
+        android:layout_alignTop="@+id/menuBluetoothTF"
+        android:layout_alignParentStart="true" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView4"
+        android:src="@drawable/device"
+        android:layout_alignTop="@+id/menuProximityTF"
+        android:layout_alignParentStart="true" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView5"
+        android:src="@drawable/history"
+        android:layout_alignTop="@+id/menuHistoryTF"
+        android:layout_alignParentStart="true" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView6"
+        android:src="@drawable/proximityzones"
+        android:layout_alignBottom="@+id/menuZonesTF"
+        android:layout_alignParentStart="true" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView7"
+        android:src="@drawable/help"
+        android:layout_alignTop="@+id/menuHelpTF"
+        android:layout_alignParentStart="true" />
+
+</RelativeLayout>

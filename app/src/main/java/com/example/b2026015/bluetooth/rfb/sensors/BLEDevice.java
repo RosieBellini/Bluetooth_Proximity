@@ -30,8 +30,11 @@ import android.os.Build;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.b2026015.bluetooth.rfb.activities.MenuActivity;
+import com.example.b2026015.bluetooth.rfb.entities.RecentScan;
 import com.example.b2026015.bluetooth.rfb.services.BLEScanningService;
 import com.example.b2026015.bluetooth.rfb.storage.Logger;
+import com.example.b2026015.bluetooth.rfb.storage.ScansDB;
 import com.neovisionaries.bluetooth.ble.advertising.ADPayloadParser;
 import com.neovisionaries.bluetooth.ble.advertising.ADStructure;
 import com.neovisionaries.bluetooth.ble.advertising.EddystoneTLM;
@@ -45,7 +48,7 @@ import java.util.List;
 public class BLEDevice {
 
     private String TAG = "BLEDevice";
-    private String thisDeviceAddress;
+    private static String thisDeviceAddress, thisDeviceName;
 
     static String BLE = "BLE";
     private Context mContext;
@@ -84,6 +87,14 @@ public class BLEDevice {
         setupHardware(timestamp);
     }
 
+    public static String getBLEAddress() {
+        return thisDeviceAddress;
+    }
+
+    public static String getBLEName() {
+        return thisDeviceName;
+    }
+
 
     // Import BLE hardware, alert user if BLE is not supported
     private boolean setupHardware(long timestamp){
@@ -95,8 +106,7 @@ public class BLEDevice {
         bluetoothAdapter = bluetoothManager.getAdapter();
 
         thisDeviceAddress = bluetoothAdapter.getAddress();
-        System.out.println("THIS ADDRESS IS:" + thisDeviceAddress);
-
+        thisDeviceName = bluetoothAdapter.getName();
 
         // If OS is Lollipop or below
         if (Build.VERSION.SDK_INT < 21) {
@@ -130,20 +140,16 @@ public class BLEDevice {
 
                         // If the device exists: add to list of known devices
                         if (device != null) {
-
-                            // Parse scan record into advertising structure format to determine type
-                            List<ADStructure> structures = ADPayloadParser.getInstance().parse(scanRecord);
-                            for (ADStructure structure : structures) { // Check to see if device is a beacon as need to compare advertising structure
-                                if (structure instanceof EddystoneUID || structure instanceof EddystoneURL || structure instanceof EddystoneTLM || structure instanceof IBeacon) {
-                                    addBLEDevice(device, result.getRssi(), scanRecord);
-                                } else {
-                                    addDevice(device, result.getRssi(), result);
-                                }
-
+                            if(device.getType() == BluetoothDevice.DEVICE_TYPE_LE) // If device is a low energy device only
+                             {
+                                 addBLEDevice(device, result.getRssi(), scanRecord);
+                                 ScansDB rc = ScansDB.getInstance(mContext);
+                                 rc.addScan(device, System.currentTimeMillis());
+                                 //rc.getResponse(device.getAddress());
+                             }
                             }
                         }
                     }
-                }
 
 
                 @Override
@@ -197,7 +203,6 @@ public class BLEDevice {
             mLogger.flush();
     }
 
-
     // BTDevice scan callback
     private BluetoothAdapter.LeScanCallback leScanCallback = new BluetoothAdapter.LeScanCallback() {
         @Override
@@ -222,18 +227,18 @@ public class BLEDevice {
     }
 
     // Using the same distance cutoffs as estimote
-    public static BLEDevice.Proximity proximityFromAccuracy(double accuracy)
+    public static String proximityFromAccuracy(double accuracy)
     {
         if (accuracy < 0.0) {
-            return Proximity.UNKNOWN;
+            return "Unknown";
         }
         if (accuracy < 0.5) {
-            return Proximity.IMMEDIATE;
+            return "Immediate";
         }
         if (accuracy <= 3.0) {
-            return Proximity.NEAR;
+            return "Near";
         }
-        return Proximity.FAR;
+        return "Far";
     }
 
     public static double calculateDistance(long rssi, double txPower) {
@@ -260,9 +265,9 @@ public class BLEDevice {
         double distance = computeAccuracy(rssi, power);
         //double distance = calculateDistance(result.getRssi(), power);
 
-            mLogger.writeAsync(System.currentTimeMillis() + "," + device.getAddress() + "," + rssi + "," + device.getName() + ",,," + power + ",");
-            BLEScanningService.addNewEntity(System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
-        }
+        mLogger.writeAsync(System.currentTimeMillis() + "," + device.getAddress() + "," + rssi + "," + device.getName() + ",,," + power + ",");
+        BLEScanningService.addNewEntity(System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
+    }
 
 
     private void addBLEDevice(BluetoothDevice device, int rssi, byte[] scanRecord) {
@@ -286,38 +291,38 @@ public class BLEDevice {
 
 
             } else if (structure instanceof EddystoneURL) {
-                    // Eddystone URL
-                    EddystoneURL es = (EddystoneURL) structure;
-                    // (1) Calibrated Tx power at 0 m.
-                    //-41dBm for power at 1m
-                    int power = es.getTxPower() - 41;
+                // Eddystone URL
+                EddystoneURL es = (EddystoneURL) structure;
+                // (1) Calibrated Tx power at 0 m.
+                //-41dBm for power at 1m
+                int power = es.getTxPower() - 41;
 
-                    mLogger.writeAsync(System.currentTimeMillis() + "," + device.getAddress() + "," + rssi + "," + device.getName() + ",,," + power + ",");//doesn't have a major, minor or uuid.
-                    double distance = computeAccuracy(rssi, power);
-                    //double distance = calculateDistance(rssi, power);
-                    BLEScanningService.addNewEntity(System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
+                mLogger.writeAsync(System.currentTimeMillis() + "," + device.getAddress() + "," + rssi + "," + device.getName() + ",,," + power + ",");//doesn't have a major, minor or uuid.
+                double distance = computeAccuracy(rssi, power);
+                //double distance = calculateDistance(rssi, power);
+                BLEScanningService.addNewEntity(System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
 
             } else if (structure instanceof EddystoneTLM) {
-                        // Eddystone TLM
-                        EddystoneTLM es = (EddystoneTLM) structure;
-                        float temperature = es.getBeaconTemperature();
-                        long elapsed = es.getElapsedTime();
-                        int batt = es.getBatteryVoltage();
+                // Eddystone TLM
+                EddystoneTLM es = (EddystoneTLM) structure;
+                float temperature = es.getBeaconTemperature();
+                long elapsed = es.getElapsedTime();
+                int batt = es.getBatteryVoltage();
 
-                    } else if (structure instanceof IBeacon) {
-                        // iBeacon
-                        IBeacon iBeacon = (IBeacon) structure;
-                        String uuid = iBeacon.getUUID().toString();
-                        if (uuid.equals("b9407f30-f5f8-466e-aff9-25556b57fe6d")) // if uuid is the standard estimote one, then ignore it to save space. otherwise log it, as its for the nearables.
-                            uuid = "";
-                        int major = iBeacon.getMajor();
-                        int minor = iBeacon.getMinor();
-                        int power = iBeacon.getPower();
+            } else if (structure instanceof IBeacon) {
+                // iBeacon
+                IBeacon iBeacon = (IBeacon) structure;
+                String uuid = iBeacon.getUUID().toString();
+                if (uuid.equals("b9407f30-f5f8-466e-aff9-25556b57fe6d")) // if uuid is the standard estimote one, then ignore it to save space. otherwise log it, as its for the nearables.
+                    uuid = "";
+                int major = iBeacon.getMajor();
+                int minor = iBeacon.getMinor();
+                int power = iBeacon.getPower();
 
-                        mLogger.writeAsync(System.currentTimeMillis() + "," + device.getAddress() + "," + rssi + "," + device.getName() + "," + major + "," + minor + "," + power + "," + uuid);
-                        double distance = computeAccuracy(rssi, power);
-                        //double distance = calculateDistance(rssi, power);
-                        BLEScanningService.addNewEntity(System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
+                mLogger.writeAsync(System.currentTimeMillis() + "," + device.getAddress() + "," + rssi + "," + device.getName() + "," + major + "," + minor + "," + power + "," + uuid);
+                double distance = computeAccuracy(rssi, power);
+                //double distance = calculateDistance(rssi, power);
+                BLEScanningService.addNewEntity(System.currentTimeMillis(), device.getName(), device.getAddress(), rssi, power, distance);
             }
         }
     }
@@ -344,7 +349,6 @@ public class BLEDevice {
         advertLeDevices(enable);
         advertLeDevices(enable);
     }
-
 
     private void advertLeDevices(final boolean enable){
         if(mLEAdvert != null) {

@@ -1,38 +1,23 @@
 package com.example.b2026015.bluetooth.rfb.services;
 
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.media.RingtoneManager;
 import android.os.Binder;
-import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Parcel;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import com.example.b2026015.bluetooth.R;
-import com.example.b2026015.bluetooth.rfb.activities.DeviceActivity;
 import com.example.b2026015.bluetooth.rfb.activities.FeedbackActivity;
-import com.example.b2026015.bluetooth.rfb.entities.BTDevice;
+import com.example.b2026015.bluetooth.rfb.model.BTDevice;
 import com.example.b2026015.bluetooth.rfb.entities.InteractionTimer;
 import com.example.b2026015.bluetooth.rfb.entities.Prompt;
-import com.example.b2026015.bluetooth.rfb.sensors.BLEDevice;
-
-import java.security.Timestamp;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 public class TimerService extends Service {
@@ -41,12 +26,14 @@ public class TimerService extends Service {
     private static String encounterType;
     private static boolean isAlive;
 
-
     // Arraylist for close proximity devices
-    private static HashMap<String, BTDevice> closeProxBTDevices;
+    private static ConcurrentHashMap<String, BTDevice> closeProxBTDevices;
     private final IBinder mBinder = new LocalBinder();
     private static Context mContext;
     private static int count = 0;
+
+    private static long TIME_OUT = 30000;
+    private static long MIN_INTERACTION_LENGTH = 60000;
 
     // Unique Identification Number for the Notification.
     // We use it on Notification start, and to cancel it.
@@ -70,37 +57,79 @@ public class TimerService extends Service {
     @Override
     public void onCreate() {
         isAlive = true;
-        closeProxBTDevices = new HashMap<>();
+        closeProxBTDevices = new ConcurrentHashMap<>();
         mContext = this.getApplicationContext();
 
+        // Check every 5 seconds whether you need to remove any close proximity devices
         Timer timer = new Timer();
-        timer.schedule(new CheckProximity(), 0, 10000); //Check whether you need to remove any
+        timer.schedule(new CheckProximity(), 0, 5000);
     }
 
-    // Adds device if in close proximity to application
-    public static void addCloseProxDevice(BTDevice sBtd, long timeStamp) {
-        InteractionTimer it = new InteractionTimer(timeStamp);
-        sBtd.setIt(it);
-        closeProxBTDevices.put(sBtd.getMACAddress(), sBtd);
+    public static void changeTimes(int newTimeOut, int newIntLength) {
+        TIME_OUT = TimeUnit.MINUTES.toMillis(newTimeOut);
+        MIN_INTERACTION_LENGTH = TimeUnit.MINUTES.toMillis(newIntLength);
+    }
+
+//    // Adds device if in close proximity to application
+//    public static void addCloseProxDevice(BTDevice sBtd, long timeStamp) {
+//        InteractionTimer it = new InteractionTimer(timeStamp);
+//        sBtd.setIt(it);
+//        closeProxBTDevices.put(sBtd.getMACAddress(), sBtd);
+//    }
+
+    public static boolean addCloseProxDevice(BTDevice sBtd, long timeStamp) {
+
+        String key = sBtd.getMACAddress();
+
+        if(closeProxBTDevices.containsKey(key)) {
+            // If already contains key, do not allow addition of new device
+            return false;
+        } else {
+            InteractionTimer it = new InteractionTimer(timeStamp);
+            sBtd.setIt(it);
+            closeProxBTDevices.put(key, sBtd);
+            return true;
+        }
     }
 
     // Removes device if no longer in immediate zone + checks timer
     public void removeCloseProxDevice() {
+
+        // If ScanningService is active
         if (BLEScanningService.isAlive()) {
-            System.out.println("GOT UP TO HERE: 1 START");
-            for (Map.Entry<String, BTDevice> entry : closeProxBTDevices.entrySet()) {
-                System.out.println("GOT UP TO HERE: 2 FOR");
-                if (entry.getValue().getDistance() > 2.0) // 3 minutes - interaction happened?
+
+            Iterator it = closeProxBTDevices.entrySet().iterator();
+
+            // For each entry in 'Close Proximity List'
+            while(it.hasNext()) {
+
+                Map.Entry<String, BTDevice> pair = (Map.Entry<String, BTDevice>) it.next();
+                System.out.println("1. MAC ADDRESS: " + pair.getKey() + "   " + "GET DISTANCE: " + pair.getValue().getDistance());
+
+                // If device has a distance over 2.0 OR putRSSI method was not called in 30 seconds
+                if (pair.getValue().getDistance() > 2.0 || ((System.currentTimeMillis() - pair.getValue().getRssiTimeCalled()) > TIME_OUT) ) // 1 minute
                 {
-                    System.out.println(entry.getValue().getMACAddress() + " " + entry.getValue().getDistance());
-                    System.out.println("GOT UP TO HERE: 3 DISTANCE > 2.0");
-                    entry.getValue().getIt().endTimer(System.currentTimeMillis());
-                    System.out.println(entry.getValue().getIt().getInteractionLength());
-                    if (entry.getValue().getIt().getInteractionLength() >= 180000) { // > 3 minutes
-                        System.out.println("GOT UP TO HERE: 4 NOTIFICATION");
-                        sendNotification(entry.getValue());
-                        closeProxBTDevices.remove(entry.getKey());
+                    System.out.println("2. MAC ADDRESS: " + pair.getKey() + "   " + "GET DISTANCE: " + pair.getValue().getDistance() + "TIME BETWEEN CALLS:" + (System.currentTimeMillis() - pair.getValue().getRssiTimeCalled()));
+
+                    // End timer, interaction is over
+                    pair.getValue().getIt().endTimer(System.currentTimeMillis());
+
+                    System.out.println("3. MAC ADDRESS:" + pair.getKey() + "   " + "INTERACTION LENGTH:" + pair.getValue().getIt().getInteractionLength());
+
+                    if (pair.getValue().getIt().getInteractionLength() >= MIN_INTERACTION_LENGTH) { // > 1 minutes
+                        System.out.println("4. N MAC ADDRESS:" + pair.getKey() + "   " + "INTERACTION LENGTH:" + pair.getValue().getIt().getInteractionLength());
+
+                        Intent mIntent = new Intent();
+                        mIntent.setClass(this, FeedbackActivity.class);
+                        mIntent.putExtra("second_person_name", pair.getValue().getName());
+                        mIntent.putExtra("second_person_mac", pair.getValue().getMACAddress());
+                        mIntent.putExtra("length_interaction", pair.getValue().getIt().getInteractionLength());
+                        mIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                        sendNotification(pair.getValue(), mIntent);
+                        closeProxBTDevices.remove(pair.getKey());
                     }
+
                 }
             }
         }
@@ -110,13 +139,10 @@ public class TimerService extends Service {
         return closeProxBTDevices.size();
     }
 
-    public void sendNotification(BTDevice b) {
-
-        // The PendingIntent to launch our activity if the user selects this notification
-        Intent mIntent = new Intent(mContext, FeedbackActivity.class);
+    public void sendNotification(BTDevice b, Intent mIntent) {
 
         // Type of encounter (Choice of casual encounter / lab talk / meeting)
-        encounterType = "meeting";
+        encounterType = "casual";
 
         switch (encounterType) {
             case "casual":
@@ -151,6 +177,5 @@ public class TimerService extends Service {
     public IBinder onBind(Intent intent) {
         return mBinder;
     }
-
 
 }

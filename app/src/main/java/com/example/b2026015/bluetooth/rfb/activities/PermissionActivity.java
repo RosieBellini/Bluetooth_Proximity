@@ -18,24 +18,37 @@ public class PermissionActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_permission);
-        mIntent = new Intent(this, DeviceActivity.class);
+        mIntent = new Intent(this, MenuActivity.class);
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         // If Bluetooth isn't on - turn it on.
         if(mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
             turnOnBluetooth();
+            if(turnOnBluetooth()) {
+                PermissionActivity.this.startActivity(mIntent);
+            }
+            else {
+                turnOnBluetooth();
+            }
+        }
+        else {
+            //Intent myIntent = new Intent(PermissionActivity.this, PairingActivity.class);
+            PermissionActivity.this.startActivity(mIntent);
         }
 
-        //Intent myIntent = new Intent(PermissionActivity.this, PairingActivity.class);
-        PermissionActivity.this.startActivity(mIntent);
-        }
+    }
 
-
-    private void turnOnBluetooth()
+    private boolean turnOnBluetooth()
     {
         Intent intentBtEnabled = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         int REQUEST_ENABLE_BT = 1;
         startActivityForResult(intentBtEnabled, REQUEST_ENABLE_BT);
+        if (REQUEST_ENABLE_BT != 1) {
+            return false;
+        }
+        else {
+            return true;
+        }
     }
 
 }

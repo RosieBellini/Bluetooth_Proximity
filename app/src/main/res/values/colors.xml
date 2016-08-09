@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimary">#2d7cf1</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#ff4081</color>
     <color name="white">#FFFFFF</color>
@@ -12,5 +12,8 @@
     <color name="labTalk">#f9cd65</color>
     <color name="labTalkk">#f9d465</color>
     <color name="meeting">#f58787</color>
+    <color name="responseTitle">#9fbcff</color>
+    <color name="responseSubTitle">#dcace3</color>
+    <color name="interactionYN">#78c9ce</color>
 
 </resources>

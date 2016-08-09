@@ -8,7 +8,6 @@ import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.support.v4.app.NotificationCompat;
 import com.example.b2026015.bluetooth.R;
-import com.example.b2026015.bluetooth.rfb.activities.FeedbackActivity;
 import com.example.b2026015.bluetooth.rfb.services.TimerService;
 
 public class Prompt {
